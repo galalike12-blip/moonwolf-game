@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import crypto from 'crypto';
 import express from 'express';
+import fs from 'fs';
 import { createServer } from 'http';
 import path from 'path';
 import { Server, Socket } from 'socket.io';
@@ -1445,7 +1446,7 @@ function transitionToGameOver(
 
 async function startServer() {
   const app = express();
-  app.use(express.json());
+  app.use(express.json({ limit: '15mb' }));
 
   const httpServer = createServer(app);
   const io = new Server(httpServer, {
@@ -1457,6 +1458,44 @@ async function startServer() {
 
   app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', activeRooms: rooms.size, geminiConfigured: !!process.env.GEMINI_API_KEY });
+  });
+
+  // Direct PNG Icon Uploader: saves the user's exact original PNG file to /public/
+  app.post('/api/upload-icon', (req, res) => {
+    try {
+      const { dataUrl } = req.body || {};
+      if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) {
+        return res.status(400).json({ ok: false, error: 'กรุณาเลือกไฟล์รูปภาพ PNG' });
+      }
+      const base64Match = dataUrl.split(',')[1];
+      if (!base64Match) {
+        return res.status(400).json({ ok: false, error: 'ข้อมูลไฟล์รูปภาพไม่ถูกต้อง' });
+      }
+      const imgBuffer = Buffer.from(base64Match, 'base64');
+      const publicDir = path.join(__dirname, 'public');
+      const targetFiles = [
+        'icon-512.png',
+        'icon-192.png',
+        'pwa-512x512.png',
+        'pwa-192x192.png',
+        'pwa-maskable-512x512.png',
+        'apple-touch-icon.png',
+      ];
+      for (const fileName of targetFiles) {
+        fs.writeFileSync(path.join(publicDir, fileName), imgBuffer);
+      }
+      const distDir = path.join(__dirname, 'dist');
+      if (fs.existsSync(distDir)) {
+        for (const fileName of targetFiles) {
+          fs.writeFileSync(path.join(distDir, fileName), imgBuffer);
+        }
+      }
+      const version = Date.now();
+      io.emit('icon_updated', { version });
+      return res.json({ ok: true, version });
+    } catch (err: any) {
+      return res.status(500).json({ ok: false, error: err?.message || 'ไม่สามารถบันทึกไอคอนได้' });
+    }
   });
 
   // Google Gemini TTS Voices catalog

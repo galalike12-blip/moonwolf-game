@@ -300,6 +300,9 @@ export default function App() {
   const [isGmSpeaking, setIsGmSpeaking] = useState<boolean>(false);
   const [errorBanner, setErrorBanner] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [iconVersion, setIconVersion] = useState<number>(() => Date.now());
+  const [isUploadingIcon, setIsUploadingIcon] = useState<boolean>(false);
+  const iconInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     soundEngine.onSpeakingStateChange((speaking) => {
@@ -416,10 +419,50 @@ export default function App() {
       }
     );
 
+    socket.on('icon_updated', (payload: { version: number }) => {
+      const v = payload?.version || Date.now();
+      setIconVersion(v);
+      const links = document.querySelectorAll<HTMLLinkElement>("link[rel*='icon']");
+      links.forEach((link) => {
+        const baseHref = link.getAttribute('href')?.split('?')[0] || '/icon-512.png';
+        link.href = `${baseHref}?v=${v}`;
+      });
+    });
+
     return () => {
       socket.disconnect();
     };
   }, []);
+
+  const handleUploadOriginalIcon = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingIcon(true);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const dataUrl = reader.result as string;
+        const res = await fetch('/api/upload-icon', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dataUrl }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          const v = data.version || Date.now();
+          setIconVersion(v);
+        } else {
+          showError(data.error || 'อัปโหลดไอคอนไม่สำเร็จ');
+        }
+      } catch {
+        showError('เกิดข้อผิดพลาดในการบันทึกไฟล์ไอคอน');
+      } finally {
+        setIsUploadingIcon(false);
+        if (iconInputRef.current) iconInputRef.current.value = '';
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const me = useMemo(() => {
     if (!roomState || !playerToken) return null;
@@ -747,12 +790,26 @@ export default function App() {
       <header className="sticky top-0 z-30 backdrop-blur-md bg-[#14161c]/95 border-b-2 border-zinc-800 px-4 py-2.5">
         <div className="max-w-md mx-auto flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5">
-            <img
-              src="/icon-192.png"
-              alt="Moonwolf Icon"
-              referrerPolicy="no-referrer"
-              className="w-10 h-10 rounded-xl object-cover shadow-md shrink-0"
+            <input
+              ref={iconInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              onChange={handleUploadOriginalIcon}
+              className="hidden"
             />
+            <button
+              type="button"
+              onClick={() => iconInputRef.current?.click()}
+              title="แตะเพื่ออัปโหลดไฟล์ PNG ต้นฉบับของคุณ"
+              className="relative group shrink-0 focus:outline-none"
+            >
+              <img
+                src={`/icon-192.png?v=${iconVersion}`}
+                alt="Moonwolf Icon"
+                referrerPolicy="no-referrer"
+                className="w-10 h-10 rounded-xl object-cover shadow-md transition-transform group-hover:scale-105"
+              />
+            </button>
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-display font-black tracking-wider text-sm text-white">
@@ -901,12 +958,33 @@ export default function App() {
           <div className="my-auto space-y-4 py-2">
             {/* Hero Title Card (Comic Charcoal Tabletop Aesthetic) */}
             <div className="rounded-2xl bg-[#14161c] border-2 border-zinc-850 p-6 text-center cartoon-card-shadow space-y-3">
-              <img
-                src="/icon-512.png"
-                alt="Moonwolf App Icon"
-                referrerPolicy="no-referrer"
-                className="w-24 h-24 rounded-2xl mx-auto object-cover shadow-xl"
-              />
+              <div className="flex flex-col items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => iconInputRef.current?.click()}
+                  className="relative group focus:outline-none"
+                  title="แตะเพื่อใช้ไฟล์ PNG ต้นฉบับจากเครื่องของคุณ"
+                >
+                  <img
+                    src={`/icon-512.png?v=${iconVersion}`}
+                    alt="Moonwolf App Icon"
+                    referrerPolicy="no-referrer"
+                    className="w-24 h-24 rounded-2xl mx-auto object-cover shadow-xl transition-transform group-hover:scale-105"
+                  />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => iconInputRef.current?.click()}
+                  disabled={isUploadingIcon}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-zinc-800/90 hover:bg-zinc-700 border border-amber-500/40 text-[11px] font-bold text-amber-300 transition-colors"
+                >
+                  <span>
+                    {isUploadingIcon
+                      ? 'กำลังบันทึกไฟล์ PNG ต้นฉบับ...'
+                      : '📁 แตะเพื่อเลือกไฟล์ PNG ไอคอนต้นฉบับจากเครื่อง'}
+                  </span>
+                </button>
+              </div>
               <div className="space-y-1">
                 <h1 className="font-display text-2xl font-black tracking-wider text-white">
                   MOONWOLF
