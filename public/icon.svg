@@ -1,44 +1,322 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <radialGradient id="charcoalBg" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stopColor="#252930" />
-      <stop offset="100%" stopColor="#101216" />
+    <!-- Clip path for inner rounded square canvas -->
+    <clipPath id="innerClip">
+      <rect x="20" y="20" width="472" height="472" rx="92" ry="92" />
+    </clipPath>
+
+    <clipPath id="moonClip">
+      <circle cx="256" cy="236" r="158" />
+    </clipPath>
+
+    <!-- 3D Metallic Gold Outer Border Gradient -->
+    <linearGradient id="goldOuterRim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="20%" stop-color="#facc15" />
+      <stop offset="45%" stop-color="#ca8a04" />
+      <stop offset="70%" stop-color="#eab308" />
+      <stop offset="88%" stop-color="#a16207" />
+      <stop offset="100%" stop-color="#713f12" />
+    </linearGradient>
+
+    <linearGradient id="goldInnerBevel" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#78350f" />
+      <stop offset="35%" stop-color="#ca8a04" />
+      <stop offset="70%" stop-color="#fde047" />
+      <stop offset="100%" stop-color="#fef9c3" />
+    </linearGradient>
+
+    <linearGradient id="goldArcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d97706" />
+      <stop offset="25%" stop-color="#fde047" />
+      <stop offset="50%" stop-color="#fef08a" />
+      <stop offset="75%" stop-color="#eab308" />
+      <stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+
+    <!-- Night Sky Gradient -->
+    <linearGradient id="nightSky" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#0e1130" />
+      <stop offset="40%" stop-color="#191647" />
+      <stop offset="70%" stop-color="#381e78" />
+      <stop offset="88%" stop-color="#7030ad" />
+      <stop offset="100%" stop-color="#2e1557" />
+    </linearGradient>
+
+    <!-- Full Moon Outer Glow -->
+    <radialGradient id="moonHalo" cx="50%" cy="46%" r="44%">
+      <stop offset="0%" stop-color="#fef3c7" stop-opacity="0.95" />
+      <stop offset="60%" stop-color="#fbbf24" stop-opacity="0.4" />
+      <stop offset="82%" stop-color="#c084fc" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#3b1d70" stop-opacity="0" />
     </radialGradient>
+
+    <!-- Full Moon Base Surface -->
+    <radialGradient id="moonSurface" cx="42%" cy="42%" r="58%">
+      <stop offset="0%" stop-color="#fffef7" />
+      <stop offset="45%" stop-color="#fef2c4" />
+      <stop offset="78%" stop-color="#fcd480" />
+      <stop offset="95%" stop-color="#f5b041" />
+      <stop offset="100%" stop-color="#e59424" />
+    </radialGradient>
+
+    <radialGradient id="tychoRay" cx="38%" cy="56%" r="45%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+      <stop offset="22%" stop-color="#fffbeb" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#fde68a" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Mountain & Cliff Gradients -->
+    <linearGradient id="mountainFar" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#3d2478" />
+      <stop offset="100%" stop-color="#191038" />
+    </linearGradient>
+
+    <linearGradient id="mountainMid" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#281754" />
+      <stop offset="100%" stop-color="#100a26" />
+    </linearGradient>
+
+    <linearGradient id="cliffEdgeHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#53358e" />
+      <stop offset="45%" stop-color="#28184b" />
+      <stop offset="100%" stop-color="#0b0818" />
+    </linearGradient>
   </defs>
-  <!-- Background Card Tile with Thick Border -->
-  <rect width="512" height="512" rx="110" fill="url(#charcoalBg)" stroke="#3a3f4a" stroke-width="20" />
-  
-  <!-- Warm Golden Cartoon Moon -->
-  <circle cx="256" cy="230" r="160" fill="#f59e0b" stroke="#d97706" stroke-width="12" />
-  <circle cx="210" cy="180" r="28" fill="#fbbf24" opacity="0.6" />
-  <circle cx="310" cy="260" r="20" fill="#fbbf24" opacity="0.6" />
 
-  <!-- Bold Cartoon Howling Werewolf Silhouette with thick lineart -->
-  <path d="M160 420 
-           L190 330 
-           L150 280 
-           L190 250 
-           L175 190 
-           L230 220 
-           L256 185 
-           L282 220 
-           L337 190 
-           L322 250 
-           L362 280 
-           L322 330 
-           L352 420 
-           Z" 
-        fill="#14171c" 
-        stroke="#f3f4f6" 
-        stroke-width="16" 
-        stroke-linejoin="round" />
-  
-  <!-- Glowing Fierce Cartoon Eyes -->
-  <ellipse cx="236" cy="254" rx="8" ry="12" fill="#ef4444" transform="rotate(-15 236 254)" />
-  <ellipse cx="276" cy="254" rx="8" ry="12" fill="#ef4444" transform="rotate(15 276 254)" />
-  <circle cx="236" cy="254" r="3" fill="#ffffff" />
-  <circle cx="276" cy="254" r="3" fill="#ffffff" />
+  <!-- 1. OUTER 3D METALLIC GOLD SQUIRCLE FRAME -->
+  <rect x="2" y="2" width="508" height="508" rx="110" ry="110" fill="#5c3409" />
+  <rect x="5" y="5" width="502" height="502" rx="107" ry="107" fill="url(#goldOuterRim)" />
+  <rect x="15" y="15" width="482" height="482" rx="97" ry="97" fill="url(#goldInnerBevel)" />
+  <rect x="19" y="19" width="474" height="474" rx="93" ry="93" fill="#422006" />
 
-  <!-- Cartoon Claws / Moon Crescent Base Accent -->
-  <path d="M130 435 C200 465, 312 465, 382 435" fill="none" stroke="#f59e0b" stroke-width="14" stroke-linecap="round" />
+  <!-- 2. INNER SCENE (CLIPPED TO SQUIRCLE) -->
+  <g clip-path="url(#innerClip)">
+    <!-- Night Sky Background -->
+    <rect x="20" y="20" width="472" height="472" fill="url(#nightSky)" />
+
+    <!-- Horizon Purple Glow -->
+    <ellipse cx="256" cy="390" rx="235" ry="95" fill="#9333ea" opacity="0.32" />
+
+    <!-- Starfield (Dots & 4-Point Sparkles) -->
+    <g fill="#fef9c3" opacity="0.92">
+      <circle cx="62" cy="96" r="1.8" />
+      <circle cx="88" cy="64" r="1.5" />
+      <circle cx="118" cy="108" r="2.1" />
+      <circle cx="145" cy="54" r="1.5" />
+      <circle cx="176" cy="72" r="1.8" />
+      <circle cx="74" cy="148" r="1.9" />
+      <circle cx="52" cy="196" r="1.5" />
+      <circle cx="96" cy="212" r="1.4" />
+      <circle cx="348" cy="58" r="1.8" />
+      <circle cx="384" cy="76" r="2.1" />
+      <circle cx="422" cy="66" r="1.5" />
+      <circle cx="448" cy="104" r="2" />
+      <circle cx="396" cy="116" r="1.4" />
+      <circle cx="456" cy="148" r="1.8" />
+      <circle cx="428" cy="186" r="2.2" />
+      <circle cx="464" cy="216" r="1.5" />
+      <circle cx="416" cy="242" r="1.8" />
+      <circle cx="444" cy="272" r="1.4" />
+
+      <!-- 4-point Star Sparkles -->
+      <path d="M70 74 L72 80 L78 82 L72 84 L70 90 L68 84 L62 82 L68 80 Z" fill="#fde047" />
+      <path d="M95 162 L96.8 167 L102 168.8 L96.8 170.6 L95 175.6 L93.2 170.6 L88 168.8 L93.2 167 Z" fill="#fef08a" />
+      <path d="M408 86 L409.8 91 L415 92.8 L409.8 94.6 L408 99.6 L406.2 94.6 L401 92.8 L406.2 91 Z" fill="#fde047" />
+      <path d="M446 174 L447.5 178 L451.5 179.5 L447.5 181 L446 185 L444.5 181 L440.5 179.5 L444.5 178 Z" fill="#fef08a" />
+    </g>
+
+    <!-- 3. GIANT GLOWING FULL MOON -->
+    <circle cx="256" cy="236" r="212" fill="url(#moonHalo)" />
+    <circle cx="256" cy="236" r="162" fill="#fde68a" opacity="0.28" />
+    <circle cx="256" cy="236" r="158" fill="url(#moonSurface)" />
+
+    <!-- Detailed Organic Lunar Maria & Craters -->
+    <g clip-path="url(#moonClip)">
+      <!-- Warm Amber Maria Regions -->
+      <path d="M150 115 C180 102, 225 110, 245 135 C262 155, 250 190, 222 198 C192 206, 175 185, 152 172 C132 160, 130 128, 150 115 Z" fill="#ea9a28" opacity="0.38" />
+      <path d="M195 148 C228 138, 272 150, 290 182 C304 208, 286 244, 252 248 C220 252, 188 228, 182 198 C176 172,178 154,195 148 Z" fill="#d9822b" opacity="0.35" />
+      <path d="M278 118 C312 125, 348 152, 355 188 C360 215, 336 228, 314 215 C292 202, 272 172, 278 118 Z" fill="#e59838" opacity="0.3" />
+      <path d="M108 205 C132 192, 165 212, 170 245 C175 278, 148 312, 122 298 C98 284, 92 220, 108 205 Z" fill="#d9822b" opacity="0.38" />
+      <path d="M145 268 C172 258, 198 278, 204 308 C210 335, 184 362, 158 348 C136 336, 126 276, 145 268 Z" fill="#e59838" opacity="0.32" />
+      <path d="M215 288 C246 278, 280 296, 286 328 C292 356, 256 382, 222 372 C194 364, 192 300, 215 288 Z" fill="#d9822b" opacity="0.28" />
+      <path d="M335 212 C365 208, 398 238, 395 275 C392 308, 358 328, 335 310 C315 295, 312 235, 335 212 Z" fill="#e59838" opacity="0.36" />
+
+      <!-- Smaller Textured Crater Spots -->
+      <circle cx="242" cy="108" r="12" fill="#d9822b" opacity="0.32" />
+      <circle cx="268" cy="128" r="8" fill="#d9822b" opacity="0.35" />
+      <circle cx="154" cy="184" r="15" fill="#c66b1d" opacity="0.28" />
+      <circle cx="218" cy="212" r="18" fill="#c66b1d" opacity="0.26" />
+      <circle cx="248" cy="228" r="11" fill="#c66b1d" opacity="0.3" />
+      <circle cx="356" cy="196" r="14" fill="#d9822b" opacity="0.32" />
+      <circle cx="182" cy="316" r="14" fill="#d9822b" opacity="0.28" />
+      <circle cx="256" cy="328" r="10" fill="#c66b1d" opacity="0.3" stroke="#fffef0" stroke-width="2.5" />
+
+      <!-- Bright Impact Crater & Light Rays (Lower Left-Center) -->
+      <circle cx="198" cy="256" r="48" fill="url(#tychoRay)" />
+      <circle cx="198" cy="256" r="8" fill="#ffffff" opacity="0.95" />
+      <g stroke="#fffef2" stroke-width="2" opacity="0.55" stroke-linecap="round">
+        <line x1="198" y1="256" x2="138" y2="212" />
+        <line x1="198" y1="256" x2="132" y2="266" />
+        <line x1="198" y1="256" x2="154" y2="326" />
+        <line x1="198" y1="256" x2="254" y2="316" />
+        <line x1="198" y1="256" x2="266" y2="230" />
+        <line x1="198" y1="256" x2="186" y2="188" />
+      </g>
+    </g>
+
+    <!-- 4. DISTANT PURPLE MOUNTAINS -->
+    <polygon points="20,445 95,365 148,402 195,358 258,415 315,375 390,435 390,492 20,492" fill="url(#mountainFar)" />
+    <polygon points="60,465 142,388 186,422 232,374 295,438 295,492 60,492" fill="url(#mountainMid)" />
+
+    <!-- 5. LOWER GOLDEN CIRCULAR ARC (ONLY BOTTOM HALF AS IN REFERENCE) -->
+    <path
+      d="M 21 250 A 235 235 0 0 0 491 250"
+      fill="none"
+      stroke="url(#goldArcGrad)"
+      stroke-width="8.5"
+      stroke-linecap="round"
+    />
+
+    <!-- 6. DETAILED EVERGREEN PINE TREES (LEFT & RIGHT) -->
+    <!-- Left Tallest Pine Tree (x=52) -->
+    <path
+      d="M52 186
+         L38 218 L45 216 L32 246 L42 244 L26 276 L39 273 L21 306 L36 303 L17 338 L34 334 L14 372 L32 368 L12 410 L92 410
+         L72 368 L90 372 L70 334 L87 338 L68 303 L83 306 L65 273 L78 276 L62 244 L72 246 L59 216 L66 218 Z"
+      fill="#0b091e"
+    />
+    <!-- Left Second Pine Tree (x=96) -->
+    <path
+      d="M96 254
+         L83 284 L90 282 L76 312 L86 310 L70 342 L82 340 L64 374 L78 371 L58 408 L134 408
+         L114 371 L128 374 L110 340 L122 342 L106 310 L116 312 L102 282 L109 284 Z"
+      fill="#0b091e"
+    />
+    <!-- Left Third Pine Tree (x=144) -->
+    <path
+      d="M144 316
+         L132 344 L138 342 L125 370 L134 368 L119 398 L129 396 L112 430 L176 430
+         L159 396 L169 398 L154 368 L163 370 L150 342 L156 344 Z"
+      fill="#0b091e"
+    />
+    <!-- Left Fourth Small Pine Tree (x=176) -->
+    <path
+      d="M176 382
+         L166 404 L172 403 L161 426 L168 425 L156 452 L196 452
+         L184 425 L191 426 L180 403 L186 404 Z"
+      fill="#100b26"
+    />
+    <!-- Left Fifth Tiny Pine Tree (x=210) -->
+    <path
+      d="M210 412 L201 432 L206 431 L197 454 L223 454 L214 431 L219 432 Z"
+      fill="#130d2e"
+    />
+
+    <!-- Right Tall Pine Tree (x=456) -->
+    <path
+      d="M456 220
+         L443 250 L450 248 L436 278 L446 276 L430 308 L442 306 L425 340 L439 337 L420 374 L436 370 L416 410 L496 410
+         L476 370 L492 374 L473 337 L487 340 L470 306 L482 308 L466 276 L476 278 L462 248 L469 250 Z"
+      fill="#0b091e"
+    />
+    <!-- Right Second Pine Tree (x=402) -->
+    <path
+      d="M402 346
+         L390 372 L396 370 L383 398 L392 396 L376 428 L428 428
+         L412 396 L421 398 L408 370 L414 372 Z"
+      fill="#0b091e"
+    />
+
+    <!-- 7. FOREGROUND ROCKY CLIFF LEDGE (JUTTING FROM RIGHT) -->
+    <polygon
+      points="192,492 235,455 282,422 276,388 256,356 262,348 342,366 432,396 462,492"
+      fill="#090718"
+    />
+    <polygon
+      points="256,348 310,356 368,374 345,392 292,382 268,368"
+      fill="url(#cliffEdgeHighlight)"
+    />
+    <polygon
+      points="276,388 318,395 348,418 302,435 252,468 224,492 192,492 238,452 282,422"
+      fill="#1b1138"
+    />
+    <polygon
+      points="318,395 375,405 395,436 335,458 295,492 252,492 302,435 348,418"
+      fill="#120b29"
+    />
+
+    <!-- 8. HOWLING WOLF SILHOUETTE ON THE CLIFF -->
+    <g>
+      <!-- Sleek Howling Wolf Silhouette Matching Reference -->
+      <path
+        d="M276 177
+           C281 177, 287 182, 294 189
+           C300 194, 307 198, 314 202
+           C323 204, 333 209, 338 216
+           L324 216
+           C332 223, 342 233, 354 244
+           C372 256, 394 268, 412 282
+           C426 294, 436 312, 452 324
+           C464 333, 478 336, 490 334
+           C482 342, 468 346, 454 344
+           C436 341, 420 330, 408 318
+           L414 346
+           L409 384
+           L397 382
+           L403 376
+           L398 344
+           L388 328
+           L382 362
+           L369 360
+           L375 353
+           L364 318
+           C348 322, 334 321, 320 315
+           L314 356
+           L301 355
+           L307 348
+           L304 320
+           L296 353
+           L283 351
+           L289 344
+           L291 316
+           L284 304
+           L276 306
+           L278 290
+           L269 292
+           L273 274
+           L265 275
+           L271 255
+           L264 256
+           L270 236
+           L265 237
+           L271 218
+           L268 206
+           C265 198, 265 192, 268 190
+           C272 192, 277 195, 282 196
+           C277 190, 273 184, 274 179
+           Z"
+        fill="#090718"
+      />
+
+      <!-- Subtle Violet-Indigo Fur Highlights on Mane & Back -->
+      <g fill="#2e1d5c" opacity="0.85">
+        <path d="M278 222 C285 230, 290 240, 286 248 C282 240, 278 232, 278 222 Z" />
+        <path d="M276 244 C284 254, 290 264, 285 272 C280 264, 276 254, 276 244 Z" />
+        <path d="M280 268 C288 276, 294 286, 290 294 C285 286, 281 278, 280 268 Z" />
+        <path d="M294 232 C302 242, 308 254, 303 262 C298 252, 294 242, 294 232 Z" />
+        <path d="M302 258 C310 268, 315 278, 310 286 C305 278, 302 268, 302 258 Z" />
+        <path d="M316 211 L333 215 L322 219 Z" />
+        <path d="M350 245 C372 257, 392 269, 408 283 C390 273, 370 263, 348 250 Z" />
+        <path d="M416 288 C430 300, 444 318, 462 328 C444 322, 428 306, 414 294 Z" />
+      </g>
+
+      <!-- Glowing Eye Slit -->
+      <path d="M291 191 Q294 189 297 192 Q293 194 291 191 Z" fill="#fef08a" opacity="0.9" />
+    </g>
+
+    <!-- Bottom Foreground Framing Shadows -->
+    <path d="M20 408 L95 408 L155 452 L220 492 L20 492 Z" fill="#080616" />
+    <path d="M412 408 L492 408 L492 492 L385 492 Z" fill="#080616" />
+  </g>
 </svg>

@@ -87,28 +87,14 @@ export const RoleTarotCard: React.FC<RoleTarotCardProps> = ({
                 <span className="text-zinc-500 font-mono-num">SECRET CARD</span>
               </div>
 
-              {/* Expressive Cartoon Mascot Emblem */}
+              {/* Moonwolf Official Icon Emblem */}
               <div className="relative flex flex-col items-center justify-center my-auto">
-                <div className="relative w-40 h-40 rounded-full bg-[#20242c] border-4 border-zinc-600/80 flex items-center justify-center shadow-inner">
-                  {/* Cartoon Golden Moon */}
-                  <div className="absolute w-28 h-28 rounded-full bg-amber-500 border-4 border-amber-600/80 top-3 left-4 opacity-90" />
-                  
-                  {/* Cartoon Wolf Silhouette with Thick Lineart */}
-                  <svg viewBox="0 0 120 120" className="relative z-10 w-32 h-32 drop-shadow-md">
-                    <path
-                      d="M26 100 L38 68 L24 50 L40 40 L34 18 L52 32 L60 28 L68 32 L86 18 L80 40 L96 50 L82 68 L94 100 Z"
-                      fill="#121418"
-                      stroke="#f3f4f6"
-                      strokeWidth="3.5"
-                      strokeLinejoin="round"
-                    />
-                    <circle cx="48" cy="48" r="4.5" fill="#ef4444" />
-                    <circle cx="72" cy="48" r="4.5" fill="#ef4444" />
-                    <circle cx="49" cy="47" r="1.5" fill="#ffffff" />
-                    <circle cx="73" cy="47" r="1.5" fill="#ffffff" />
-                    <path d="M52 64 Q60 70 68 64" fill="none" stroke="#f3f4f6" strokeWidth="2.5" strokeLinecap="round" />
-                  </svg>
-                </div>
+                <img
+                  src="/icon-512.png"
+                  alt="Moonwolf Emblem"
+                  referrerPolicy="no-referrer"
+                  className="w-44 h-44 rounded-3xl object-cover shadow-2xl transition-transform duration-300 group-hover:scale-105"
+                />
               </div>
 
               {/* Tap to Reveal Prompt */}

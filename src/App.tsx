@@ -747,9 +747,12 @@ export default function App() {
       <header className="sticky top-0 z-30 backdrop-blur-md bg-[#14161c]/95 border-b-2 border-zinc-800 px-4 py-2.5">
         <div className="max-w-md mx-auto flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-zinc-800 border-2 border-zinc-700 flex items-center justify-center text-amber-400 cartoon-btn-shadow">
-              <Moon className="w-5 h-5 text-amber-400" />
-            </div>
+            <img
+              src="/icon-192.png"
+              alt="Moonwolf Icon"
+              referrerPolicy="no-referrer"
+              className="w-10 h-10 rounded-xl object-cover shadow-md shrink-0"
+            />
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-display font-black tracking-wider text-sm text-white">
@@ -898,9 +901,12 @@ export default function App() {
           <div className="my-auto space-y-4 py-2">
             {/* Hero Title Card (Comic Charcoal Tabletop Aesthetic) */}
             <div className="rounded-2xl bg-[#14161c] border-2 border-zinc-850 p-6 text-center cartoon-card-shadow space-y-3">
-              <div className="w-16 h-16 rounded-2xl bg-zinc-800 border-2 border-zinc-750 mx-auto flex items-center justify-center cartoon-btn-shadow text-amber-400">
-                <Moon className="w-8 h-8 text-amber-400 stroke-[2.2]" />
-              </div>
+              <img
+                src="/icon-512.png"
+                alt="Moonwolf App Icon"
+                referrerPolicy="no-referrer"
+                className="w-24 h-24 rounded-2xl mx-auto object-cover shadow-xl"
+              />
               <div className="space-y-1">
                 <h1 className="font-display text-2xl font-black tracking-wider text-white">
                   MOONWOLF
