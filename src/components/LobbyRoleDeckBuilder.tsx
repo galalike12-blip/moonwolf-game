@@ -2,6 +2,7 @@ import { Check, Hand, Info, Minus, Plus, Sparkles, Wand2 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import React, { useMemo, useState } from 'react';
 import { soundEngine } from '../audio/soundEngine';
+import { ROLE_CARD_THEMES, RoleCharacterArt } from './RoleIllustration';
 import { FactionType, RoleType } from './RoleTarotCard';
 
 export type RoleConfigMap = Record<RoleType, number>;
@@ -164,95 +165,7 @@ export const RoleArtworkSvg: React.FC<{ role: RoleType; className?: string }> = 
   role,
   className = 'w-10 h-10',
 }) => {
-  switch (role) {
-    case 'WEREWOLF':
-      return (
-        <svg viewBox="0 0 100 100" className={className}>
-          <circle cx="50" cy="50" r="38" fill="#e11d48" opacity="0.25" />
-          <path
-            d="M24 84 L32 54 L18 40 L34 30 L28 12 L44 24 L50 20 L56 24 L72 12 L66 30 L82 40 L68 54 L76 84 Z"
-            fill="#14161b"
-            stroke="#fb7185"
-            strokeWidth="3.2"
-            strokeLinejoin="round"
-          />
-          <polygon points="38,44 46,47 40,50" fill="#ffffff" />
-          <polygon points="62,44 54,47 60,50" fill="#ffffff" />
-          <circle cx="42" cy="46" r="2.5" fill="#ef4444" />
-          <circle cx="58" cy="46" r="2.5" fill="#ef4444" />
-        </svg>
-      );
-    case 'MINION':
-      return (
-        <svg viewBox="0 0 100 100" className={className}>
-          <circle cx="50" cy="50" r="36" fill="#9f1239" opacity="0.3" />
-          <path d="M26 84 C28 58 38 46 50 46 C62 46 72 58 74 84 Z" fill="#14171d" stroke="#fb7185" strokeWidth="2.8" />
-          <path d="M50 18 L70 44 L62 60 L38 60 L30 44 Z" fill="#0d0f13" stroke="#fda4af" strokeWidth="2.8" />
-          <circle cx="44" cy="44" r="3" fill="#ef4444" />
-          <circle cx="56" cy="44" r="3" fill="#ef4444" />
-          <line x1="26" y1="74" x2="74" y2="28" stroke="#fecdd3" strokeWidth="3" strokeLinecap="round" />
-        </svg>
-      );
-    case 'BODYGUARD':
-      return (
-        <svg viewBox="0 0 100 100" className={className}>
-          <circle cx="50" cy="50" r="38" fill="#10b981" opacity="0.22" />
-          <path d="M50 14 L80 26 V52 C80 72 66 86 50 92 C34 86 20 72 20 52 V26 L50 14 Z" fill="#0d2118" stroke="#34d399" strokeWidth="3.2" />
-          <path d="M50 32 L54 46 L68 50 L54 54 L50 68 L46 54 L32 50 L46 46 Z" fill="#a7f3d0" />
-        </svg>
-      );
-    case 'SEER':
-      return (
-        <svg viewBox="0 0 100 100" className={className}>
-          <circle cx="50" cy="50" r="38" fill="#f59e0b" opacity="0.2" />
-          <circle cx="50" cy="50" r="26" fill="#181a20" stroke="#f59e0b" strokeWidth="3.2" />
-          <path d="M28 50 Q50 32 72 50 Q50 68 28 50 Z" fill="#2d2412" stroke="#fde68a" strokeWidth="2.8" />
-          <circle cx="50" cy="50" r="8" fill="#f59e0b" />
-          <circle cx="50" cy="50" r="3.5" fill="#ffffff" />
-        </svg>
-      );
-    case 'WITCH':
-      return (
-        <svg viewBox="0 0 100 100" className={className}>
-          <circle cx="50" cy="50" r="38" fill="#10b981" opacity="0.15" />
-          <path d="M30 26 H40 V36 L48 62 C50 70 44 78 36 78 H34 C26 78 20 70 22 62 L30 36 Z" fill="#064e3b" stroke="#34d399" strokeWidth="2.8" />
-          <path d="M60 26 H70 V36 L78 62 C80 70 74 78 66 78 H64 C56 78 50 70 52 62 L60 36 Z" fill="#7f1d1d" stroke="#f87171" strokeWidth="2.8" />
-          <circle cx="35" cy="58" r="4.5" fill="#6ee7b7" />
-          <circle cx="65" cy="58" r="4.5" fill="#fca5a5" />
-        </svg>
-      );
-    case 'HUNTER':
-      return (
-        <svg viewBox="0 0 100 100" className={className}>
-          <circle cx="50" cy="50" r="36" fill="#042f2e" stroke="#2dd4bf" strokeWidth="3.2" />
-          <circle cx="50" cy="50" r="18" fill="none" stroke="#99f6e4" strokeWidth="2" strokeDasharray="3 3" />
-          <line x1="50" y1="12" x2="50" y2="88" stroke="#ccfbf1" strokeWidth="2.8" />
-          <line x1="12" y1="50" x2="88" y2="50" stroke="#ccfbf1" strokeWidth="2.8" />
-          <circle cx="50" cy="50" r="5.5" fill="#ef4444" />
-        </svg>
-      );
-    case 'FOOL':
-      return (
-        <svg viewBox="0 0 100 100" className={className}>
-          <circle cx="50" cy="52" r="35" fill="#291805" stroke="#fbbf24" strokeWidth="3.2" />
-          <path d="M24 70 L20 38 L38 52 L50 26 L62 52 L80 38 L76 70 Z" fill="#78350f" stroke="#fde68a" strokeWidth="2.8" />
-          <circle cx="20" cy="34" r="4.5" fill="#fde68a" />
-          <circle cx="50" cy="22" r="4.5" fill="#fde68a" />
-          <circle cx="80" cy="34" r="4.5" fill="#fde68a" />
-        </svg>
-      );
-    case 'VILLAGER':
-    default:
-      return (
-        <svg viewBox="0 0 100 100" className={className}>
-          <circle cx="50" cy="52" r="36" fill="#0284c7" opacity="0.2" />
-          <path d="M40 22 L60 22 L66 32 L34 32 Z" fill="#1e293b" stroke="#7dd3fc" strokeWidth="2.8" />
-          <rect x="36" y="32" width="28" height="38" rx="4" fill="#0f172a" stroke="#7dd3fc" strokeWidth="2.8" />
-          <circle cx="50" cy="50" r="7" fill="#f59e0b" />
-          <path d="M30 70 L70 70 L74 80 L26 80 Z" fill="#1e293b" stroke="#7dd3fc" strokeWidth="2.8" />
-        </svg>
-      );
-  }
+  return <RoleCharacterArt role={role} className={className} />;
 };
 
 interface LobbyRoleDeckBuilderProps {
@@ -473,6 +386,7 @@ export const LobbyRoleDeckBuilder: React.FC<LobbyRoleDeckBuilderProps> = ({
               <AnimatePresence mode="popLayout">
                 {handCards.map((card, idx) => {
                   const isInspected = inspectedRole === card.meta.role;
+                  const theme = ROLE_CARD_THEMES[card.meta.role] || ROLE_CARD_THEMES.VILLAGER;
                   return (
                     <motion.button
                       key={card.key}
@@ -487,37 +401,36 @@ export const LobbyRoleDeckBuilder: React.FC<LobbyRoleDeckBuilderProps> = ({
                           prev === card.meta.role ? null : card.meta.role
                         )
                       }
-                      className={`group relative aspect-[3/4.4] rounded-xl bg-gradient-to-b ${
-                        card.meta.cardBgClass
-                      } border-[2.5px] ${
-                        card.meta.borderClass
-                      } p-1.5 flex flex-col items-center justify-between cartoon-card-shadow active:scale-95 transition-transform ${
-                        isInspected ? 'ring-2 ring-white scale-105' : ''
+                      style={{
+                        backgroundColor: theme.cardBg,
+                        borderColor: theme.borderColor,
+                      }}
+                      className={`group relative aspect-[3/4.4] rounded-[18px] border-[3px] p-1.5 flex flex-col items-center justify-between shadow-lg active:scale-95 transition-transform overflow-hidden ${
+                        isInspected ? 'ring-3 ring-amber-400 scale-105' : ''
                       }`}
                     >
+                      {/* Card Vignette Overlay */}
+                      <div className="absolute inset-0 bg-radial from-transparent to-black/40 pointer-events-none rounded-[15px]" />
+
                       {/* Top Header */}
-                      <div className="w-full flex items-center justify-between px-0.5 text-[9px] font-mono-num font-bold text-zinc-300">
+                      <div className="relative z-10 w-full flex items-center justify-between px-0.5 text-[9px] font-mono-num font-black text-white drop-shadow">
                         <span>#{idx + 1}</span>
                         <span
-                          className={`w-2 h-2 rounded-full ${
-                            card.meta.faction === 'WEREWOLF'
-                              ? 'bg-rose-500'
-                              : card.meta.faction === 'NEUTRAL'
-                              ? 'bg-amber-400'
-                              : 'bg-emerald-400'
-                          }`}
-                        />
+                          className={`px-1 rounded text-[8px] border ${theme.badgeBg} ${theme.badgeText} ${theme.badgeBorder}`}
+                        >
+                          {theme.shortNameTh}
+                        </span>
                       </div>
 
                       {/* Center Cartoon Artwork */}
-                      <div className="my-auto flex items-center justify-center">
-                        <RoleArtworkSvg role={card.meta.role} className="w-10 h-10 drop-shadow" />
+                      <div className="relative z-10 my-auto w-full h-[62px] flex items-center justify-center p-0.5">
+                        <RoleCharacterArt role={card.meta.role} className="w-full h-full drop-shadow" />
                       </div>
 
                       {/* Bottom Role Label */}
-                      <div className="w-full text-center bg-black/75 rounded-md py-0.5 px-1 border border-white/10">
-                        <p className={`text-[10px] font-black truncate ${card.meta.accentTextClass}`}>
-                          {card.meta.shortNameTh}
+                      <div className="relative z-10 w-full text-center bg-black/60 rounded-full py-0.5 px-1 border border-white/20">
+                        <p className="text-[10px] font-black text-white truncate drop-shadow">
+                          {card.meta.nameTh}
                         </p>
                       </div>
                     </motion.button>
@@ -572,6 +485,7 @@ export const LobbyRoleDeckBuilder: React.FC<LobbyRoleDeckBuilderProps> = ({
                         const negativeMargin =
                           total >= 10 ? '-ml-7' : total >= 7 ? '-ml-5' : total >= 5 ? '-ml-3.5' : '-ml-2';
 
+                        const theme = ROLE_CARD_THEMES[card.meta.role] || ROLE_CARD_THEMES.VILLAGER;
                         return (
                           <motion.button
                             key={card.key}
@@ -583,29 +497,34 @@ export const LobbyRoleDeckBuilder: React.FC<LobbyRoleDeckBuilderProps> = ({
                             transition={{ type: 'spring', stiffness: 340, damping: 22 }}
                             type="button"
                             onClick={() => handleRemoveRoleCard(card.meta.role)}
-                            style={{ zIndex: idx + 1 }}
+                            style={{
+                              zIndex: idx + 1,
+                              backgroundColor: theme.cardBg,
+                              borderColor: theme.borderColor,
+                            }}
                             className={`relative ${
                               idx === 0 ? '' : negativeMargin
-                            } w-[68px] h-[104px] sm:w-[74px] sm:h-[112px] rounded-xl bg-gradient-to-b ${
-                              card.meta.cardBgClass
-                            } border-[2.5px] ${
-                              card.meta.borderClass
-                            } p-1.5 flex flex-col items-center justify-between cartoon-card-shadow cursor-pointer select-none origin-bottom`}
+                            } w-[72px] h-[110px] sm:w-[78px] sm:h-[118px] rounded-[18px] border-[3px] p-1.5 flex flex-col items-center justify-between shadow-xl cursor-pointer select-none origin-bottom overflow-hidden`}
                             title={`แตะเพื่อนำ "${card.meta.nameTh}" ออกจากมือ`}
                           >
-                            <div className="w-full flex items-center justify-between px-0.5">
-                              <span className="text-[8px] font-mono-num font-bold text-zinc-300">
+                            {/* Card Vignette Overlay */}
+                            <div className="absolute inset-0 bg-radial from-transparent to-black/40 pointer-events-none rounded-[15px]" />
+
+                            <div className="relative z-10 w-full flex items-center justify-between px-0.5">
+                              <span className="text-[8px] font-mono-num font-black text-white drop-shadow">
                                 #{idx + 1}
                               </span>
-                              <span className="w-3.5 h-3.5 rounded-full bg-black/80 border border-white/20 flex items-center justify-center text-[9px] text-rose-300 font-black">
+                              <span className="w-4 h-4 rounded-full bg-black/80 border border-white/30 flex items-center justify-center text-[10px] text-white font-black">
                                 −
                               </span>
                             </div>
 
-                            <RoleArtworkSvg role={card.meta.role} className="w-9 h-9 sm:w-10 sm:h-10 drop-shadow" />
+                            <div className="relative z-10 w-full h-[58px] flex items-center justify-center p-0.5">
+                              <RoleCharacterArt role={card.meta.role} className="w-full h-full drop-shadow" />
+                            </div>
 
-                            <div className="w-full rounded bg-black/80 px-1 py-0.5 border border-white/10 text-center">
-                              <p className={`text-[9px] font-black truncate ${card.meta.accentTextClass}`}>
+                            <div className="relative z-10 w-full rounded-full bg-black/70 px-1 py-0.5 border border-white/20 text-center">
+                              <p className="text-[9px] font-black text-white truncate drop-shadow">
                                 {card.meta.shortNameTh}
                               </p>
                             </div>
@@ -644,6 +563,7 @@ export const LobbyRoleDeckBuilder: React.FC<LobbyRoleDeckBuilderProps> = ({
               {ROLE_VISUAL_CATALOG.map((meta) => {
                 const countInHand = roleConfig[meta.role] || 0;
                 const isSelected = countInHand > 0;
+                const theme = ROLE_CARD_THEMES[meta.role] || ROLE_CARD_THEMES.VILLAGER;
 
                 return (
                   <motion.div
@@ -656,8 +576,8 @@ export const LobbyRoleDeckBuilder: React.FC<LobbyRoleDeckBuilderProps> = ({
                     }}
                     whileHover={{
                       rotate: 0,
-                      y: -6,
-                      scale: 1.05,
+                      y: -8,
+                      scale: 1.08,
                       zIndex: 30,
                     }}
                     whileTap={{ scale: 0.94 }}
@@ -670,65 +590,68 @@ export const LobbyRoleDeckBuilder: React.FC<LobbyRoleDeckBuilderProps> = ({
                         handleAddRoleCard(meta.role);
                       }
                     }}
-                    className={`relative aspect-[3/4.4] rounded-xl bg-gradient-to-b ${
-                      meta.cardBgClass
-                    } border-[2.5px] ${
-                      isSelected
-                        ? `${meta.borderClass} ring-2 ring-white/40`
-                        : 'border-zinc-700/80 opacity-80 hover:opacity-100'
-                    } p-1.5 flex flex-col items-center justify-between cartoon-card-shadow cursor-pointer select-none`}
-                  >
-                    {/* Top Bar: Info + Count */}
-                    <div className="w-full flex items-center justify-between gap-1">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setInspectedRole((prev) => (prev === meta.role ? null : meta.role));
-                        }}
-                        className="w-5 h-5 rounded-md bg-black/60 hover:bg-black/90 border border-white/20 flex items-center justify-center text-zinc-300"
-                        aria-label={`ดูข้อมูล ${meta.nameTh}`}
-                      >
-                        <Info className="w-3 h-3" />
-                      </button>
+                    style={{
+                      backgroundColor: theme.cardBg,
+                      borderColor: isSelected ? theme.borderColor : `${theme.borderColor}80`,
+                    }}
+                      className={`relative aspect-[3/4.4] rounded-[18px] border-[3px] p-1.5 flex flex-col items-center justify-between shadow-xl cursor-pointer select-none overflow-hidden ${
+                        isSelected ? 'ring-3 ring-amber-400' : 'opacity-85 hover:opacity-100'
+                      }`}
+                    >
+                      {/* Card Vignette Overlay */}
+                      <div className="absolute inset-0 bg-radial from-transparent to-black/40 pointer-events-none rounded-[15px]" />
 
-                      {countInHand > 0 ? (
-                        <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-mono-num font-black border ${meta.badgeBgClass}`}>
-                          ×{countInHand}
-                        </span>
-                      ) : (
-                        <span className="px-1.5 py-0.5 rounded-md text-[9px] font-mono-num bg-black/60 text-zinc-400 border border-white/10 font-bold">
-                          +หยิบ
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Artwork */}
-                    <div className="my-auto flex items-center justify-center">
-                      <RoleArtworkSvg role={meta.role} className="w-10 h-10 drop-shadow" />
-                    </div>
-
-                    {/* Bottom Label + Minus button */}
-                    <div className="w-full space-y-1">
-                      <div className="w-full rounded bg-black/80 px-1 py-0.5 border border-white/10 text-center">
-                        <p className={`text-[10px] font-black truncate ${meta.accentTextClass}`}>
-                          {meta.shortNameTh}
-                        </p>
-                      </div>
-
-                      {countInHand > 0 && (
+                      {/* Top Bar: Info + Count */}
+                      <div className="relative z-10 w-full flex items-center justify-between gap-1">
                         <button
                           type="button"
-                          onClick={(e) => handleRemoveRoleCard(meta.role, e)}
-                          className="w-full py-0.5 rounded bg-zinc-900 hover:bg-rose-950 border border-zinc-700 hover:border-rose-500/50 text-[9px] font-bold text-zinc-300 hover:text-rose-200 flex items-center justify-center gap-0.5"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setInspectedRole((prev) => (prev === meta.role ? null : meta.role));
+                          }}
+                          className="w-5 h-5 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 flex items-center justify-center text-zinc-300"
+                          aria-label={`ดูข้อมูล ${meta.nameTh}`}
                         >
-                          <Minus className="w-2.5 h-2.5" />
-                          <span>ลด 1</span>
+                          <Info className="w-3 h-3" />
                         </button>
-                      )}
-                    </div>
-                  </motion.div>
-                );
+
+                        {countInHand > 0 ? (
+                          <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono-num font-black border ${theme.badgeBg} ${theme.badgeText} ${theme.badgeBorder}`}>
+                            ×{countInHand}
+                          </span>
+                        ) : (
+                          <span className="px-1.5 py-0.5 rounded-full text-[9px] font-mono-num bg-black/60 text-zinc-300 border border-white/20 font-bold">
+                            +หยิบ
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Artwork */}
+                      <div className="relative z-10 my-auto w-full h-[64px] flex items-center justify-center p-0.5">
+                        <RoleCharacterArt role={meta.role} className="w-full h-full drop-shadow" />
+                      </div>
+
+                      {/* Bottom Label + Minus button */}
+                      <div className="relative z-10 w-full space-y-1">
+                        <div className="w-full rounded-full bg-black/70 px-1 py-0.5 border border-white/20 text-center">
+                          <p className="text-[10px] font-black text-white truncate drop-shadow">
+                            {meta.shortNameTh}
+                          </p>
+                        </div>
+
+                        {countInHand > 0 && (
+                          <button
+                            type="button"
+                            onClick={(e) => handleRemoveRoleCard(meta.role, e)}
+                            className="w-full py-0.5 rounded-full bg-zinc-900/90 hover:bg-rose-950 border border-zinc-700 hover:border-rose-500/50 text-[9px] font-bold text-zinc-200 hover:text-rose-200 flex items-center justify-center gap-0.5"
+                          >
+                            <Minus className="w-2.5 h-2.5" />
+                            <span>ลด 1</span>
+                          </button>
+                        )}
+                      </div>
+                    </motion.div>
+                  );
               })}
             </div>
           </div>

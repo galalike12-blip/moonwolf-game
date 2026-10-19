@@ -8,6 +8,7 @@ import {
   Flame,
   FlaskConical,
   LogOut,
+  Mic,
   Minus,
   Moon,
   Plus,
@@ -28,6 +29,7 @@ import {
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { soundEngine } from './audio/soundEngine';
+import { GeminiVoiceModal } from './components/GeminiVoiceModal';
 import { RulesAndDeployModal } from './components/GameModals';
 import { LobbyRoleDeckBuilder } from './components/LobbyRoleDeckBuilder';
 import { PWAInstallBanner } from './components/PWAInstallBanner';
@@ -38,6 +40,7 @@ import {
   RoleTarotCard,
   RoleType,
 } from './components/RoleTarotCard';
+import { ROLE_CARD_THEMES, RoleCharacterArt } from './components/RoleIllustration';
 
 type GamePhase =
   | 'LOBBY'
@@ -292,6 +295,7 @@ export default function App() {
   const [showSeerNotebook, setShowSeerNotebook] = useState<boolean>(false);
   const [isScannerOpen, setIsScannerOpen] = useState<boolean>(false);
   const [isRulesModalOpen, setIsRulesModalOpen] = useState<boolean>(false);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isGmSpeaking, setIsGmSpeaking] = useState<boolean>(false);
   const [errorBanner, setErrorBanner] = useState<string | null>(null);
@@ -373,6 +377,7 @@ export default function App() {
         text: string;
         soundEffect: 'HOWL' | 'BELL' | 'GAVEL' | 'VICTORY' | 'NONE';
         phase: GamePhase;
+        audioId?: string;
       }) => {
         if (narration.soundEffect === 'HOWL') {
           soundEngine.playHowl();
@@ -385,8 +390,8 @@ export default function App() {
         }
 
         setTimeout(() => {
-          soundEngine.speakThaiGM(narration.text);
-        }, 450);
+          soundEngine.speakThaiGM(narration.text, narration.audioId);
+        }, 300);
       }
     );
 
@@ -786,6 +791,21 @@ export default function App() {
               ) : (
                 <Volume2 className="w-4 h-4 text-amber-400" />
               )}
+            </button>
+
+            {/* Google Gemini AI GM Voice Config Button */}
+            <button
+              type="button"
+              onClick={() => {
+                soundEngine.unlockAudioAndSpeech();
+                setIsVoiceModalOpen(true);
+              }}
+              className="min-h-[40px] px-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 flex items-center gap-1.5 text-zinc-300 hover:text-zinc-100 cartoon-btn-shadow transition-transform active:scale-95"
+              aria-label="ตั้งค่าเสียงผู้บรรยาย Gemini AI"
+              title="ตั้งค่าเสียงผู้บรรยาย Gemini AI (iPhone & Android เสียงเดียวกัน 100%)"
+            >
+              <Mic className="w-4 h-4 text-amber-400" />
+              <span className="hidden sm:inline text-[11px] font-bold text-zinc-300">เสียง GM</span>
             </button>
 
             <button
@@ -1385,15 +1405,25 @@ export default function App() {
             ) : roomState.phase === 'NIGHT_WEREWOLF' &&
               myRole.role === 'WEREWOLF' ? (
               /* WEREWOLF TURN (STEP 1) */
-              <div className="rounded-2xl bg-gradient-to-b from-[#1a080e] to-[#0d060a] border border-rose-500/40 p-5 space-y-4 shadow-2xl">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Flame className="w-5 h-5 text-rose-400" />
-                    <h2 className="text-base font-bold text-rose-100">
-                      ตาของมนุษย์หมาป่า · เลือกสังหารเหยื่อ
-                    </h2>
+              <div className="rounded-2xl bg-[#14161c] border-2 border-red-500/80 p-5 space-y-4 cartoon-card-shadow">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div
+                      style={{ backgroundColor: '#84312c', borderColor: '#ef4444' }}
+                      className="w-10 h-13 rounded-lg border-2 flex items-center justify-center p-0.5 shadow shrink-0 overflow-hidden"
+                    >
+                      <RoleCharacterArt role="WEREWOLF" className="w-full h-full drop-shadow" />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-bold text-red-200">
+                        ตาของมนุษย์หมาป่า · เลือกสังหารเหยื่อ
+                      </h2>
+                      <p className="text-[11px] text-zinc-400">
+                        เลือกเหยื่อที่จะสังหารในคืนนี้
+                      </p>
+                    </div>
                   </div>
-                  <span className="text-[11px] px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-red-950 text-red-300 border border-red-500/60 font-bold shrink-0">
                     ฝ่ายรัตติกาล
                   </span>
                 </div>
@@ -2202,48 +2232,52 @@ export default function App() {
 
               <div className="grid grid-cols-1 gap-2">
                 {roomState.players.map((p) => {
-                  const isEvil =
-                    p.revealedRole === 'WEREWOLF' || p.revealedRole === 'MINION';
-                  const isFool = p.revealedRole === 'FOOL';
+                  const roleTheme = p.revealedRole ? ROLE_CARD_THEMES[p.revealedRole] : null;
                   return (
                     <div
                       key={p.id}
-                      className={`rounded-xl px-3.5 py-2.5 border-2 flex items-center justify-between ${
-                        isEvil
-                          ? 'bg-rose-950/40 border-rose-600/60'
-                          : isFool
-                          ? 'bg-amber-950/40 border-amber-500/60'
-                          : 'bg-[#101216] border-zinc-800'
-                      }`}
+                      className="rounded-xl px-3 py-2 border-2 flex items-center justify-between bg-[#101216] border-zinc-800"
                     >
-                      <div className="space-y-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold text-white">
-                            {p.name}
-                          </span>
-                          <span
-                            className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
-                              p.isAlive
-                                ? 'bg-emerald-500/20 text-emerald-300'
-                                : 'bg-rose-500/20 text-rose-300'
-                            }`}
+                      <div className="flex items-center gap-3">
+                        {p.revealedRole && (
+                          <div
+                            style={{
+                              backgroundColor: roleTheme?.cardBg || '#1e293b',
+                              borderColor: roleTheme?.borderColor || '#475569',
+                            }}
+                            className="w-10 h-13 rounded-lg border-2 flex items-center justify-center p-0.5 shadow shrink-0 overflow-hidden"
                           >
-                            {p.isAlive ? 'รอดชีวิต' : 'เสียชีวิต'}
-                          </span>
+                            <RoleCharacterArt role={p.revealedRole} className="w-full h-full drop-shadow" />
+                          </div>
+                        )}
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-white">
+                              {p.name}
+                            </span>
+                            <span
+                              className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                                p.isAlive
+                                  ? 'bg-emerald-500/20 text-emerald-300'
+                                  : 'bg-rose-500/20 text-rose-300'
+                              }`}
+                            >
+                              {p.isAlive ? 'รอดชีวิต' : 'เสียชีวิต'}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-zinc-400">
+                            {roleTheme ? roleTheme.nameTh : p.revealedRoleNameTh}
+                          </p>
                         </div>
                       </div>
 
-                      <span
-                        className={`text-xs font-bold px-2.5 py-1 rounded-lg ${
-                          isEvil
-                            ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                            : isFool
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                            : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
-                        }`}
-                      >
-                        {p.revealedRoleNameTh || p.revealedRole}
-                      </span>
+                      {roleTheme && (
+                        <span
+                          className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${roleTheme.badgeBg} ${roleTheme.badgeText} ${roleTheme.badgeBorder}`}
+                        >
+                          {roleTheme.shortNameTh}
+                        </span>
+                      )}
                     </div>
                   );
                 })}
@@ -2297,6 +2331,11 @@ export default function App() {
       <RulesAndDeployModal
         isOpen={isRulesModalOpen}
         onClose={() => setIsRulesModalOpen(false)}
+      />
+
+      <GeminiVoiceModal
+        isOpen={isVoiceModalOpen}
+        onClose={() => setIsVoiceModalOpen(false)}
       />
     </div>
   );

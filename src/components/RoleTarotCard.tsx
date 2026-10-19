@@ -1,5 +1,6 @@
 import React from 'react';
 import { soundEngine } from '../audio/soundEngine';
+import { ROLE_CARD_THEMES, RoleCharacterArt } from './RoleIllustration';
 
 export type RoleType =
   | 'WEREWOLF'
@@ -45,6 +46,7 @@ export const RoleTarotCard: React.FC<RoleTarotCardProps> = ({
   const { role } = roleData;
   const isEvil = role === 'WEREWOLF' || role === 'MINION';
   const isFool = role === 'FOOL';
+  const theme = ROLE_CARD_THEMES[role] || ROLE_CARD_THEMES.VILLAGER;
 
   const handleFlip = () => {
     soundEngine.unlockAudioAndSpeech();
@@ -122,173 +124,60 @@ export const RoleTarotCard: React.FC<RoleTarotCardProps> = ({
           </div>
 
           {/* =================================================================
-              BACK OF CARD (REVEALED CARTOON ROLE - CHARCOAL WITH BOLD ACCENT)
+              BACK OF CARD (EXACT STYLE FROM USER REFERENCE IMAGE - 1792393082533.jpg)
              ================================================================= */}
           <div
-            className={`absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-2xl p-3.5 flex flex-col justify-between overflow-hidden border-[3px] cartoon-card-shadow ${
-              isEvil
-                ? 'bg-[#181113] border-rose-600'
-                : isFool
-                ? 'bg-[#1b1710] border-amber-500'
-                : 'bg-[#12161c] border-emerald-500'
-            }`}
+            style={{
+              backgroundColor: theme.cardBg,
+              borderColor: theme.borderColor,
+            }}
+            className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-[28px] p-3.5 flex flex-col justify-between overflow-hidden border-[4px] shadow-2xl"
           >
-            <div className="relative w-full h-full rounded-xl border border-white/10 bg-[#16181e] p-3.5 flex flex-col justify-between">
+            {/* Fine Paper / Vignette Texture Overlay */}
+            <div className="absolute inset-0 bg-radial from-transparent via-black/10 to-black/50 pointer-events-none rounded-[24px]" />
+
+            <div className="relative z-10 w-full h-full flex flex-col justify-between">
               {/* Header: English Title & Faction Pill */}
-              <div className="flex items-center justify-between text-xs pb-2 border-b border-zinc-700/80">
-                <span className="font-bold tracking-wider text-zinc-300 font-mono-num">
-                  {roleData.roleNameEn}
+              <div className="flex items-center justify-between text-xs pb-1.5 border-b border-white/20">
+                <span className="font-black tracking-widest text-zinc-100 font-mono-num drop-shadow">
+                  {roleData.roleNameEn.toUpperCase()}
                 </span>
                 <span
-                  className={`px-2 py-0.5 rounded-md text-[11px] font-black border ${
-                    isEvil
-                      ? 'bg-rose-950 text-rose-300 border-rose-600'
-                      : isFool
-                      ? 'bg-amber-950 text-amber-300 border-amber-600'
-                      : 'bg-emerald-950 text-emerald-300 border-emerald-600'
-                  }`}
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-black border shadow-sm ${theme.badgeBg} ${theme.badgeText} ${theme.badgeBorder}`}
                 >
                   {roleData.factionNameTh}
                 </span>
               </div>
 
-              {/* Expressive Cartoon Role Artwork */}
-              <div className="my-2 flex items-center justify-center">
-                {role === 'WEREWOLF' && (
-                  <div className="w-28 h-28 rounded-2xl bg-[#241317] border-2 border-rose-500/80 p-2 flex items-center justify-center shadow-inner">
-                    <svg viewBox="0 0 100 100" className="w-24 h-24">
-                      <circle cx="50" cy="50" r="38" fill="#e11d48" opacity="0.25" />
-                      <path
-                        d="M24 84 L32 54 L18 40 L34 30 L28 12 L44 24 L50 20 L56 24 L72 12 L66 30 L82 40 L68 54 L76 84 Z"
-                        fill="#101216"
-                        stroke="#fb7185"
-                        strokeWidth="3"
-                        strokeLinejoin="round"
-                      />
-                      <polygon points="38,44 46,47 40,50" fill="#ffffff" />
-                      <polygon points="62,44 54,47 60,50" fill="#ffffff" />
-                      <circle cx="42" cy="46" r="2" fill="#ef4444" />
-                      <circle cx="58" cy="46" r="2" fill="#ef4444" />
-                    </svg>
-                  </div>
-                )}
-
-                {role === 'MINION' && (
-                  <div className="w-28 h-28 rounded-2xl bg-[#241317] border-2 border-rose-500/80 p-2 flex items-center justify-center shadow-inner">
-                    <svg viewBox="0 0 100 100" className="w-24 h-24">
-                      <circle cx="50" cy="50" r="36" fill="#9f1239" opacity="0.3" />
-                      <path d="M26 84 C28 58 38 46 50 46 C62 46 72 58 74 84 Z" fill="#14171d" stroke="#fb7185" strokeWidth="2.5" />
-                      <path d="M50 18 L70 44 L62 60 L38 60 L30 44 Z" fill="#0d0f13" stroke="#fda4af" strokeWidth="2.5" />
-                      <circle cx="44" cy="44" r="3" fill="#ef4444" />
-                      <circle cx="56" cy="44" r="3" fill="#ef4444" />
-                      <line x1="26" y1="74" x2="74" y2="28" stroke="#fecdd3" strokeWidth="3" strokeLinecap="round" />
-                    </svg>
-                  </div>
-                )}
-
-                {role === 'BODYGUARD' && (
-                  <div className="w-28 h-28 rounded-2xl bg-[#12241b] border-2 border-emerald-500/80 p-2 flex items-center justify-center shadow-inner">
-                    <svg viewBox="0 0 100 100" className="w-24 h-24">
-                      <circle cx="50" cy="50" r="38" fill="#10b981" opacity="0.2" />
-                      <path d="M50 14 L80 26 V52 C80 72 66 86 50 92 C34 86 20 72 20 52 V26 L50 14 Z" fill="#0c1f16" stroke="#34d399" strokeWidth="3" />
-                      <path d="M50 32 L54 46 L68 50 L54 54 L50 68 L46 54 L32 50 L46 46 Z" fill="#a7f3d0" />
-                    </svg>
-                  </div>
-                )}
-
-                {role === 'SEER' && (
-                  <div className="w-28 h-28 rounded-2xl bg-[#1e1c15] border-2 border-amber-500/80 p-2 flex items-center justify-center shadow-inner">
-                    <svg viewBox="0 0 100 100" className="w-24 h-24">
-                      <circle cx="50" cy="50" r="38" fill="#f59e0b" opacity="0.2" />
-                      <circle cx="50" cy="50" r="26" fill="#181a20" stroke="#f59e0b" strokeWidth="3" />
-                      <path d="M28 50 Q50 32 72 50 Q50 68 28 50 Z" fill="#2d2412" stroke="#fde68a" strokeWidth="2.5" />
-                      <circle cx="50" cy="50" r="8" fill="#f59e0b" />
-                      <circle cx="50" cy="50" r="3.5" fill="#ffffff" />
-                    </svg>
-                  </div>
-                )}
-
-                {role === 'WITCH' && (
-                  <div className="w-28 h-28 rounded-2xl bg-[#131d1a] border-2 border-emerald-500/80 p-2 flex items-center justify-center shadow-inner">
-                    <svg viewBox="0 0 100 100" className="w-24 h-24">
-                      <circle cx="50" cy="50" r="38" fill="#10b981" opacity="0.15" />
-                      <path d="M30 26 H40 V36 L48 62 C50 70 44 78 36 78 H34 C26 78 20 70 22 62 L30 36 Z" fill="#064e3b" stroke="#34d399" strokeWidth="2.5" />
-                      <path d="M60 26 H70 V36 L78 62 C80 70 74 78 66 78 H64 C56 78 50 70 52 62 L60 36 Z" fill="#7f1d1d" stroke="#f87171" strokeWidth="2.5" />
-                      <circle cx="35" cy="58" r="4" fill="#6ee7b7" />
-                      <circle cx="65" cy="58" r="4" fill="#fca5a5" />
-                    </svg>
-                  </div>
-                )}
-
-                {role === 'HUNTER' && (
-                  <div className="w-28 h-28 rounded-2xl bg-[#122426] border-2 border-teal-400/80 p-2 flex items-center justify-center shadow-inner">
-                    <svg viewBox="0 0 100 100" className="w-24 h-24">
-                      <circle cx="50" cy="50" r="36" fill="#042f2e" stroke="#2dd4bf" strokeWidth="3" />
-                      <circle cx="50" cy="50" r="18" fill="none" stroke="#99f6e4" strokeWidth="2" strokeDasharray="3 3" />
-                      <line x1="50" y1="12" x2="50" y2="88" stroke="#ccfbf1" strokeWidth="2.5" />
-                      <line x1="12" y1="50" x2="88" y2="50" stroke="#ccfbf1" strokeWidth="2.5" />
-                      <circle cx="50" cy="50" r="5" fill="#ef4444" />
-                    </svg>
-                  </div>
-                )}
-
-                {role === 'FOOL' && (
-                  <div className="w-28 h-28 rounded-2xl bg-[#281e10] border-2 border-amber-400/80 p-2 flex items-center justify-center shadow-inner">
-                    <svg viewBox="0 0 100 100" className="w-24 h-24">
-                      <circle cx="50" cy="52" r="35" fill="#291805" stroke="#fbbf24" strokeWidth="3" />
-                      <path d="M24 70 L20 38 L38 52 L50 26 L62 52 L80 38 L76 70 Z" fill="#78350f" stroke="#fde68a" strokeWidth="2.5" />
-                      <circle cx="20" cy="34" r="4" fill="#fde68a" />
-                      <circle cx="50" cy="22" r="4" fill="#fde68a" />
-                      <circle cx="80" cy="34" r="4" fill="#fde68a" />
-                    </svg>
-                  </div>
-                )}
-
-                {role === 'VILLAGER' && (
-                  <div className="w-28 h-28 rounded-2xl bg-[#141b24] border-2 border-sky-400/80 p-2 flex items-center justify-center shadow-inner">
-                    <svg viewBox="0 0 100 100" className="w-24 h-24">
-                      <circle cx="50" cy="52" r="36" fill="#0284c7" opacity="0.2" />
-                      <path d="M40 22 L60 22 L66 32 L34 32 Z" fill="#1e293b" stroke="#7dd3fc" strokeWidth="2.5" />
-                      <rect x="36" y="32" width="28" height="38" rx="4" fill="#0f172a" stroke="#7dd3fc" strokeWidth="2.5" />
-                      <circle cx="50" cy="50" r="7" fill="#f59e0b" />
-                      <path d="M30 70 L70 70 L74 80 L26 80 Z" fill="#1e293b" stroke="#7dd3fc" strokeWidth="2.5" />
-                    </svg>
-                  </div>
-                )}
+              {/* Character Artwork Matching User's Reference Card */}
+              <div className="my-auto py-1 flex items-center justify-center">
+                <div className="w-36 h-44 flex items-center justify-center drop-shadow-xl">
+                  <RoleCharacterArt role={role} className="w-full h-full" />
+                </div>
               </div>
 
               {/* Title & Tactical Rules */}
-              <div className="text-center space-y-1">
-                <h3
-                  className={`text-lg font-black tracking-tight ${
-                    isEvil
-                      ? 'text-rose-400'
-                      : isFool
-                      ? 'text-amber-400'
-                      : 'text-emerald-400'
-                  }`}
-                >
+              <div className="text-center space-y-1 bg-black/40 backdrop-blur-xs p-2.5 rounded-2xl border border-white/15">
+                <h3 className="text-base font-black tracking-tight text-white drop-shadow">
                   {roleData.roleNameTh}
                 </h3>
-                <p className="text-xs text-zinc-200 leading-snug">
+                <p className="text-[11px] text-zinc-200 leading-tight line-clamp-2">
                   {roleData.description}
                 </p>
 
                 {roleData.fellowWerewolves && roleData.fellowWerewolves.length > 0 && (
-                  <div className="rounded-lg bg-rose-950 border border-rose-600 px-2 py-1 text-[11px] text-rose-200 font-bold">
+                  <div className="rounded-lg bg-red-950/90 border border-red-500/80 px-2 py-0.5 text-[10px] text-red-200 font-bold">
                     🐺 พรรคพวกหมาป่า: {roleData.fellowWerewolves.map((w) => w.name).join(', ')}
                   </div>
                 )}
 
-                <div className="pt-1 border-t border-zinc-700/80">
-                  <p className="text-[11px] text-zinc-400 leading-tight">
-                    {roleData.advice}
-                  </p>
-                </div>
+                <p className="text-[10px] text-amber-200/90 font-medium leading-tight pt-0.5">
+                  💡 {roleData.advice}
+                </p>
               </div>
 
               <div className="text-center pt-1">
-                <span className="text-[10px] text-zinc-400 font-medium underline">
+                <span className="text-[10px] text-white/80 font-bold bg-black/30 px-2.5 py-0.5 rounded-full border border-white/10">
                   แตะที่การ์ดเพื่อคว่ำการ์ดกลับ
                 </span>
               </div>

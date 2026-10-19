@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import crypto from 'crypto';
 import express from 'express';
 import { createServer } from 'http';
@@ -5,9 +6,59 @@ import path from 'path';
 import { Server, Socket } from 'socket.io';
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
+import { GoogleGenAI } from '@google/genai';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// ============================================================================
+// GOOGLE GEMINI TTS CLIENT & IN-MEMORY AUDIO CACHE
+// ============================================================================
+
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+  httpOptions: {
+    headers: {
+      'User-Agent': 'aistudio-build',
+    },
+  },
+});
+
+const ttsAudioCache = new Map<string, string>();
+const MAX_TTS_CACHE_ENTRIES = 200;
+
+export const GEMINI_AVAILABLE_VOICES = [
+  {
+    id: 'Fenrir',
+    nameTh: 'เฟนรีร์ (Fenrir)',
+    genderTh: 'ชาย (ทุ้มลึก)',
+    styleTh: 'เสียงลึก ดุดัน น่าเกรงขาม สไตล์หมาป่ารัตติกาล (แนะนำ)',
+  },
+  {
+    id: 'Charon',
+    nameTh: 'คารอน (Charon)',
+    genderTh: 'ชาย (สุขุม)',
+    styleTh: 'เสียงทุ้มลึก สุขุม นิ่ง เยือกเย็น เหมาะกับบรรยากาศมืดมิดกอธิค',
+  },
+  {
+    id: 'Kore',
+    nameTh: 'คอร์ (Kore)',
+    genderTh: 'หญิง (สงบ)',
+    styleTh: 'เสียงผู้หญิง นุ่มนวล สงบ ชัดเจน สไตล์แม่มดมนต์ดำ',
+  },
+  {
+    id: 'Puck',
+    nameTh: 'พัค (Puck)',
+    genderTh: 'กลาง (สดใส)',
+    styleTh: 'เสียงกระฉับกระเฉง เล่าเรื่องสนุก มีชีวิตชีวา สไตล์นักเล่านิทาน',
+  },
+  {
+    id: 'Zephyr',
+    nameTh: 'เซเฟอร์ (Zephyr)',
+    genderTh: 'หญิง (เป็นธรรมชาติ)',
+    styleTh: 'เสียงฟังสบาย นุ่มนวล เป็นธรรมชาติ ชัดถ้อยชัดคำ',
+  },
+] as const;
 
 export type RoleType =
   | 'WEREWOLF'
@@ -356,15 +407,15 @@ export interface RoomState {
 
 const PHASE_DURATIONS: Record<GamePhase, number> = {
   LOBBY: 0,
-  ROLE_REVEAL: 12,
-  NIGHT_WEREWOLF: 20,
-  NIGHT_BODYGUARD: 20,
-  NIGHT_SEER: 20,
-  NIGHT_WITCH: 20,
-  DAY_DISCUSSION: 50,
-  VOTING: 30,
-  REVOTE: 20,
-  VOTE_RESULT: 6,
+  ROLE_REVEAL: 15,
+  NIGHT_WEREWOLF: 25,
+  NIGHT_BODYGUARD: 22,
+  NIGHT_SEER: 22,
+  NIGHT_WITCH: 24,
+  DAY_DISCUSSION: 55,
+  VOTING: 35,
+  REVOTE: 25,
+  VOTE_RESULT: 10,
   GAME_OVER: 0,
 };
 
@@ -536,11 +587,13 @@ function announceGM(
   io: Server,
   room: RoomState,
   text: string,
-  soundEffect: 'HOWL' | 'BELL' | 'GAVEL' | 'VICTORY' | 'NONE' = 'NONE'
+  soundEffect: 'HOWL' | 'BELL' | 'GAVEL' | 'VICTORY' | 'NONE' = 'NONE',
+  audioId?: string
 ) {
   const narration = {
     text,
     soundEffect,
+    audioId,
     phase: room.phase,
     timestamp: Date.now(),
   };
@@ -692,8 +745,9 @@ function transitionToRoleReveal(io: Server, room: RoomState) {
   announceGM(
     io,
     room,
-    'ชะตากรรมถูกกำหนดแล้ว จงแตะที่ไพ่เพื่อดูบทบาทที่แท้จริงของคุณ และเก็บเป็นความลับสุดยอด',
-    'BELL'
+    'จงแตะที่ไพ่เพื่อดูบทบาทลับของคุณ และเก็บเป็นความลับสุดยอด',
+    'BELL',
+    'role_reveal'
   );
 
   startPhaseTimer(io, room, PHASE_DURATIONS.ROLE_REVEAL, () => {
@@ -745,8 +799,9 @@ function transitionToNightWerewolf(io: Server, room: RoomState) {
   announceGM(
     io,
     room,
-    `ราตรีอันมืดมิดคืนที่ ${room.dayCount} มาเยือน ขอให้ทุกคนหลับตาลง... มนุษย์หมาป่าจงลืมตาขึ้น และเลือกเหยื่อที่ต้องการสังหาร`,
-    'HOWL'
+    'ขอให้ทุกคนหลับตาลง มนุษย์หมาป่าจงตื่นขึ้น และเลือกเหยื่อที่ต้องการสังหาร',
+    'HOWL',
+    'night_werewolf'
   );
 
   startPhaseTimer(io, room, PHASE_DURATIONS.NIGHT_WEREWOLF, () => {
@@ -772,7 +827,7 @@ function transitionToNightWerewolf(io: Server, room: RoomState) {
         livingWerewolves.forEach((w) => (w.hasActedNight = true));
       }
       advanceToNextNightSubPhase(io, room, 'NIGHT_WEREWOLF');
-    }, crypto.randomInt(3500, 6000));
+    }, crypto.randomInt(7000, 9500));
     room.botTimeoutRefs.push(t);
   }
 
@@ -798,8 +853,9 @@ function transitionToNightBodyguard(io: Server, room: RoomState) {
   announceGM(
     io,
     room,
-    'มนุษย์หมาป่าจงหลับตาลง... บัดนี้ถึงเวลาของบอดี้การ์ด จงลืมตาขึ้นและเลือกผู้ที่ต้องการปกป้องในคืนนี้',
-    'BELL'
+    'มนุษย์หมาป่าหลับตาลง บอดี้การ์ดจงตื่นขึ้น และเลือกผู้ที่ต้องการปกป้อง',
+    'BELL',
+    'night_bodyguard'
   );
 
   startPhaseTimer(io, room, PHASE_DURATIONS.NIGHT_BODYGUARD, () => {
@@ -815,7 +871,7 @@ function transitionToNightBodyguard(io: Server, room: RoomState) {
     const t = setTimeout(() => {
       if (room.phase !== 'NIGHT_BODYGUARD') return;
       advanceToNextNightSubPhase(io, room, 'NIGHT_BODYGUARD');
-    }, crypto.randomInt(4500, 7500));
+    }, crypto.randomInt(6500, 8500));
     room.botTimeoutRefs.push(t);
   } else if (livingBodyguard.isSimulated) {
     const t = setTimeout(() => {
@@ -830,7 +886,7 @@ function transitionToNightBodyguard(io: Server, room: RoomState) {
         livingBodyguard.hasActedNight = true;
       }
       advanceToNextNightSubPhase(io, room, 'NIGHT_BODYGUARD');
-    }, crypto.randomInt(3500, 6500));
+    }, crypto.randomInt(6000, 8500));
     room.botTimeoutRefs.push(t);
   }
 
@@ -856,8 +912,9 @@ function transitionToNightSeer(io: Server, room: RoomState) {
   announceGM(
     io,
     room,
-    'ขอให้หลับตาลง... บัดนี้ถึงเวลาของผู้หยั่งรู้ จงลืมตาขึ้นและเลือกตรวจสอบผู้ต้องสงสัยหนึ่งคน',
-    'BELL'
+    'บอดี้การ์ดหลับตาลง แม่หมอจงตื่นขึ้น และเลือกตรวจสอบผู้ต้องสงสัย',
+    'BELL',
+    'night_seer'
   );
 
   startPhaseTimer(io, room, PHASE_DURATIONS.NIGHT_SEER, () => {
@@ -871,7 +928,7 @@ function transitionToNightSeer(io: Server, room: RoomState) {
     const t = setTimeout(() => {
       if (room.phase !== 'NIGHT_SEER') return;
       advanceToNextNightSubPhase(io, room, 'NIGHT_SEER');
-    }, crypto.randomInt(4500, 7500));
+    }, crypto.randomInt(6500, 8500));
     room.botTimeoutRefs.push(t);
   } else if (livingSeer.isSimulated) {
     const t = setTimeout(() => {
@@ -895,7 +952,7 @@ function transitionToNightSeer(io: Server, room: RoomState) {
         });
       }
       advanceToNextNightSubPhase(io, room, 'NIGHT_SEER');
-    }, crypto.randomInt(4000, 7000));
+    }, crypto.randomInt(6000, 8500));
     room.botTimeoutRefs.push(t);
   }
 
@@ -921,8 +978,9 @@ function transitionToNightWitch(io: Server, room: RoomState) {
   announceGM(
     io,
     room,
-    'ขอให้หลับตาลง... บัดนี้ถึงเวลาของแม่มด จงลืมตาขึ้นและตัดสินใจว่าจะใช้ยาชุบชีวิตหรือยาพิษหรือไม่',
-    'BELL'
+    'แม่หมอหลับตาลง แม่มดจงตื่นขึ้น และตัดสินใจใช้ยาวิเศษ',
+    'BELL',
+    'night_witch'
   );
 
   startPhaseTimer(io, room, PHASE_DURATIONS.NIGHT_WITCH, () => {
@@ -1088,7 +1146,8 @@ function resolveNightAndTransitionToDawn(io: Server, room: RoomState) {
       ? 'รุ่งอรุณมาถึงแล้ว ขอให้ทุกคนลืมตาขึ้น... เมื่อคืนนี้เหยื่อได้รับการปกป้องไว้ได้ทัน ไม่มีผู้ใดเสียชีวิต!'
       : 'รุ่งอรุณมาถึงแล้ว ขอให้ทุกคนลืมตาขึ้น... เมื่อคืนนี้ไม่มีผู้ใดเสียชีวิต ขอให้ทุกคนร่วมกันอภิปรายหาตัวหมาป่า';
 
-  announceGM(io, room, dawnSpeech, 'BELL');
+  const dawnAudioId = victims.length > 0 ? 'dawn_wake' : 'dawn_no_kill';
+  announceGM(io, room, dawnSpeech, 'BELL', dawnAudioId);
 
   startPhaseTimer(io, room, PHASE_DURATIONS.DAY_DISCUSSION, () => {
     transitionToVoting(io, room, false, []);
@@ -1139,8 +1198,9 @@ function transitionToVoting(
     announceGM(
       io,
       room,
-      'เข้าสู่ช่วงเวลาการลงคะแนนโหวตขับไล่ ขอให้ผู้รอดชีวิตเลือกโหวตผู้ต้องสงสัย 1 คน ห้ามโหวตตัวเอง',
-      'GAVEL'
+      'ถึงเวลาลงคะแนนโหวตขับไล่ ขอให้ทุกคนเลือกโหวตผู้ต้องสงสัยหนึ่งคน',
+      'GAVEL',
+      'voting_start'
     );
   }
 
@@ -1249,7 +1309,8 @@ function resolveVotes(io: Server, room: RoomState) {
       io,
       room,
       'ไม่มีผู้ใดลงคะแนนโหวต หมู่บ้านจึงไม่มีผู้ถูกขับไล่ในวันนี้',
-      'BELL'
+      'BELL',
+      'vote_tie'
     );
     startPhaseTimer(io, room, PHASE_DURATIONS.VOTE_RESULT, () => {
       transitionToNightWerewolf(io, room);
@@ -1316,7 +1377,8 @@ function resolveVotes(io: Server, room: RoomState) {
       io,
       room,
       `ผลการโหวต ${exiledPlayer?.name} ได้รับคะแนนสูงสุดและถูกขับไล่ออกจากหมู่บ้าน... เตรียมเข้าสู่ยามราตรีอีกครั้ง`,
-      'GAVEL'
+      'GAVEL',
+      'vote_exiled'
     );
     startPhaseTimer(io, room, PHASE_DURATIONS.VOTE_RESULT, () => {
       transitionToNightWerewolf(io, room);
@@ -1341,7 +1403,8 @@ function resolveVotes(io: Server, room: RoomState) {
       io,
       room,
       'ผลการโหวตตัดเชือกยังคงเสมอกัน หมู่บ้านหาข้อสรุปไม่ได้ จึงไม่มีผู้ใดถูกขับไล่ในวันนี้',
-      'BELL'
+      'BELL',
+      'vote_tie'
     );
     startPhaseTimer(io, room, PHASE_DURATIONS.VOTE_RESULT, () => {
       transitionToNightWerewolf(io, room);
@@ -1393,7 +1456,129 @@ async function startServer() {
   });
 
   app.get('/api/health', (_req, res) => {
-    res.json({ status: 'ok', activeRooms: rooms.size });
+    res.json({ status: 'ok', activeRooms: rooms.size, geminiConfigured: !!process.env.GEMINI_API_KEY });
+  });
+
+  // Google Gemini TTS Voices catalog
+  app.get('/api/tts/voices', (_req, res) => {
+    res.json({
+      ok: true,
+      voices: GEMINI_AVAILABLE_VOICES,
+      defaultVoice: 'Fenrir',
+      model: 'gemini-3.8-flash-lite-tts',
+      isGeminiReady: !!process.env.GEMINI_API_KEY,
+    });
+  });
+
+  // Google Gemini TTS Speech Synthesis endpoint (Server-Authoritative Audio)
+  app.post('/api/tts', async (req, res) => {
+    try {
+      const { text, voice } = req.body || {};
+      const cleanText = typeof text === 'string' ? text.trim() : '';
+      if (!cleanText) {
+        return res.status(400).json({ ok: false, error: 'Text is required for TTS' });
+      }
+
+      const validVoiceIds = ['Fenrir', 'Charon', 'Kore', 'Puck', 'Zephyr'];
+      const chosenVoice = validVoiceIds.includes(voice) ? voice : 'Fenrir';
+      const cacheKey = `${chosenVoice}:${cleanText}`;
+
+      // Check In-Memory LRU Cache first (< 5ms response time)
+      if (ttsAudioCache.has(cacheKey)) {
+        return res.json({
+          ok: true,
+          audioBase64: ttsAudioCache.get(cacheKey),
+          format: 'audio/wav',
+          cached: true,
+          voice: chosenVoice,
+        });
+      }
+
+      if (!process.env.GEMINI_API_KEY) {
+        return res.json({
+          ok: false,
+          error: 'GEMINI_API_KEY is not configured on the server',
+          fallback: true,
+        });
+      }
+
+      // Try gemini-3.8-flash-tts first, fallback to gemini-3.8-flash-lite-tts if needed
+      const candidateModels = ['gemini-3.8-flash-tts', 'gemini-3.8-flash-lite-tts'];
+      let audioBase64: string | undefined;
+
+      for (const model of candidateModels) {
+        try {
+          const geminiResponse = await ai.models.generateContent({
+            model,
+            contents: [
+              {
+                role: 'user',
+                parts: [
+                  {
+                    text: cleanText,
+                    speechMetadata: {
+                      style: 'Atmospheric, dramatic, clear Thai game master narrator for werewolf party game',
+                    },
+                  },
+                ],
+              },
+            ],
+            config: {
+              responseModalities: ['AUDIO'],
+              speechConfig: {
+                voiceConfig: {
+                  prebuiltVoiceConfig: { voiceName: chosenVoice },
+                },
+              },
+            },
+          });
+
+          audioBase64 =
+            geminiResponse.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+          if (audioBase64) break;
+        } catch (mErr: any) {
+          const errMsg = String(mErr?.message || mErr);
+          const isQuota = errMsg.includes('429') || errMsg.includes('RESOURCE_EXHAUSTED') || errMsg.includes('quota');
+          if (isQuota) {
+            console.warn(`[Gemini TTS] Quota limit encountered on ${model}`);
+            // Try next model if available, otherwise exit loop
+          } else {
+            console.warn(`[Gemini TTS] Notice from ${model}:`, errMsg.slice(0, 120));
+          }
+        }
+      }
+
+      if (!audioBase64) {
+        // Return 200 with fallback: true so client seamlessly speaks via Web Speech API without UI error
+        return res.json({
+          ok: false,
+          error: 'Gemini TTS unavailable or quota reached; falling back to device Web Speech',
+          fallback: true,
+        });
+      }
+
+      // Save to cache (evict oldest if full)
+      if (ttsAudioCache.size >= MAX_TTS_CACHE_ENTRIES) {
+        const oldestKey = ttsAudioCache.keys().next().value;
+        if (oldestKey) ttsAudioCache.delete(oldestKey);
+      }
+      ttsAudioCache.set(cacheKey, audioBase64);
+
+      return res.json({
+        ok: true,
+        audioBase64,
+        format: 'audio/wav',
+        cached: false,
+        voice: chosenVoice,
+      });
+    } catch (err: any) {
+      console.warn('[Gemini TTS] Fallback triggered:', err?.message?.slice?.(0, 100) || 'Unknown notice');
+      return res.json({
+        ok: false,
+        error: 'Gemini TTS fallback',
+        fallback: true,
+      });
+    }
   });
 
   io.on('connection', (socket: Socket) => {
