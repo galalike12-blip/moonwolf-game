@@ -30,6 +30,7 @@ import { io, Socket } from 'socket.io-client';
 import { soundEngine } from './audio/soundEngine';
 import { RulesAndDeployModal } from './components/GameModals';
 import { LobbyRoleDeckBuilder } from './components/LobbyRoleDeckBuilder';
+import { PWAInstallBanner } from './components/PWAInstallBanner';
 import { InlineRoomQrCode, QrScannerModal } from './components/QrCodeTools';
 import {
   FactionType,
@@ -173,7 +174,7 @@ const ROLE_CATALOG: RoleCatalogItem[] = [
     faction: 'VILLAGER',
     factionLabelTh: 'ฝ่ายชาวบ้าน',
     shortDesc: 'ตรวจสอบผู้ต้องสงสัยคืนละ 1 คนว่าเป็นหมาป่าหรือไม่',
-    badgeClass: 'border-purple-500/40 bg-purple-950/30 text-purple-300',
+    badgeClass: 'border-amber-500/40 bg-amber-950/30 text-amber-300',
   },
   {
     role: 'WITCH',
@@ -182,7 +183,7 @@ const ROLE_CATALOG: RoleCatalogItem[] = [
     faction: 'VILLAGER',
     factionLabelTh: 'ฝ่ายชาวบ้าน',
     shortDesc: 'มียาชุบชีวิต 1 ขวด และยาพิษสังหาร 1 ขวดตลอดเกม',
-    badgeClass: 'border-fuchsia-500/40 bg-fuchsia-950/30 text-fuchsia-300',
+    badgeClass: 'border-emerald-500/40 bg-emerald-950/30 text-emerald-300',
   },
   {
     role: 'HUNTER',
@@ -241,11 +242,11 @@ const NIGHT_SUBPHASE_META: Record<
   },
   NIGHT_SEER: {
     shortLabel: 'แม่หมอตรวจสอบ',
-    activeColor: 'bg-purple-950/60 border-purple-500/60 text-purple-200',
+    activeColor: 'bg-amber-950/60 border-amber-500/60 text-amber-200',
   },
   NIGHT_WITCH: {
     shortLabel: 'แม่มดใช้น้ำยา',
-    activeColor: 'bg-fuchsia-950/60 border-fuchsia-500/60 text-fuchsia-200',
+    activeColor: 'bg-emerald-950/60 border-emerald-500/60 text-emerald-200',
   },
 };
 
@@ -717,45 +718,45 @@ export default function App() {
     roomState?.phase === 'NIGHT_WITCH';
 
   return (
-    <div className="min-h-dvh w-full bg-[#070a12] text-[#e2e8f0] flex flex-col justify-between relative overflow-x-hidden select-none">
-      {/* Ambient Moonlight Backdrop */}
+    <div className="min-h-dvh w-full bg-[#101216] text-[#f1f3f5] flex flex-col justify-between relative overflow-x-hidden select-none tabletop-surface">
+      {/* Ambient Board Game Tabletop Lighting */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
         <div
           className={`absolute -top-28 left-1/2 -translate-x-1/2 w-[520px] h-[520px] rounded-full blur-[130px] transition-colors duration-1000 ${
             roomState?.phase === 'NIGHT_WEREWOLF'
-              ? 'bg-rose-900/20'
+              ? 'bg-rose-900/15'
               : roomState?.phase === 'NIGHT_BODYGUARD'
-              ? 'bg-emerald-900/20'
+              ? 'bg-emerald-900/15'
               : roomState?.phase === 'NIGHT_SEER'
-              ? 'bg-purple-900/25'
+              ? 'bg-amber-600/12'
               : roomState?.phase === 'NIGHT_WITCH'
-              ? 'bg-fuchsia-900/25'
+              ? 'bg-emerald-600/12'
               : roomState?.phase === 'DAY_DISCUSSION'
               ? 'bg-amber-500/10'
-              : 'bg-indigo-900/15'
+              : 'bg-zinc-800/15'
           }`}
         />
       </div>
 
-      {/* Top Navigation & Automated GM Status Bar */}
-      <header className="sticky top-0 z-30 backdrop-blur-md bg-[#070a12]/85 border-b border-slate-800/80 px-4 py-2.5">
+      {/* Top Navigation & Automated GM Status Bar (Comic Charcoal Board Game Aesthetic) */}
+      <header className="sticky top-0 z-30 backdrop-blur-md bg-[#14161c]/95 border-b-2 border-zinc-800 px-4 py-2.5">
         <div className="max-w-md mx-auto flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600/30 to-indigo-900/40 border border-purple-400/30 flex items-center justify-center shadow-inner">
-              <Moon className="w-5 h-5 text-purple-300" />
+            <div className="w-9 h-9 rounded-xl bg-zinc-800 border-2 border-zinc-700 flex items-center justify-center text-amber-400 cartoon-btn-shadow">
+              <Moon className="w-5 h-5 text-amber-400" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-display font-bold tracking-wider text-sm text-white">
+                <span className="font-display font-black tracking-wider text-sm text-white">
                   MOONWOLF
                 </span>
                 {roomState && (
-                  <span className="text-[11px] font-mono-num px-2 py-0.5 rounded-md bg-slate-800/90 text-purple-300 border border-slate-700">
+                  <span className="text-[11px] font-mono-num font-bold px-2 py-0.5 rounded-md bg-zinc-800 text-amber-400 border border-zinc-700">
                     #{roomState.roomCode}
                   </span>
                 )}
               </div>
-              <p className="text-[11px] text-slate-400 truncate max-w-[180px]">
+              <p className="text-[11px] text-zinc-400 truncate max-w-[160px]">
                 {roomState
                   ? PHASE_LABELS_TH[roomState.phase]
                   : 'จันทราหมาป่า · โซเชียลดีดักชัน 4–12 คน'}
@@ -766,10 +767,10 @@ export default function App() {
           <div className="flex items-center gap-1.5">
             {isGmSpeaking && (
               <div
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-950/80 border border-purple-500/40 text-purple-200 text-[11px]"
+                className="flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300 text-[11px] font-bold"
                 title="ผู้ดำเนินเกมอัตโนมัติกำลังบรรยาย"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-ping" />
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
                 <span>GM</span>
               </div>
             )}
@@ -777,30 +778,33 @@ export default function App() {
             <button
               type="button"
               onClick={handleToggleMute}
-              className="min-h-[42px] min-w-[42px] rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 flex items-center justify-center text-slate-300 transition-colors"
+              className="min-h-[40px] min-w-[40px] rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 flex items-center justify-center text-zinc-300 cartoon-btn-shadow transition-transform active:scale-95"
               aria-label={isMuted ? 'เปิดเสียงผู้ดำเนินเกม' : 'ปิดเสียงผู้ดำเนินเกม'}
             >
               {isMuted ? (
                 <VolumeX className="w-4 h-4 text-rose-400" />
               ) : (
-                <Volume2 className="w-4 h-4 text-purple-300" />
+                <Volume2 className="w-4 h-4 text-amber-400" />
               )}
             </button>
 
             <button
               type="button"
               onClick={() => setIsRulesModalOpen(true)}
-              className="min-h-[42px] min-w-[42px] rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 flex items-center justify-center text-slate-300 transition-colors"
-              aria-label="คู่มือกติกาและคำสั่งติดตั้ง"
+              className="min-h-[40px] min-w-[40px] rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 flex items-center justify-center text-zinc-300 cartoon-btn-shadow transition-transform active:scale-95"
+              aria-label="คู่มือกติกาและวิธีเล่นฟรี"
             >
-              <BookOpen className="w-4 h-4 text-slate-300" />
+              <BookOpen className="w-4 h-4 text-zinc-300" />
             </button>
+
+            {/* PWA Fullscreen & Install Controls */}
+            <PWAInstallBanner />
 
             {roomState && (
               <button
                 type="button"
                 onClick={handleLeaveRoom}
-                className="min-h-[42px] min-w-[42px] rounded-xl bg-slate-900/90 hover:bg-rose-950/60 border border-slate-800 hover:border-rose-500/40 flex items-center justify-center text-slate-400 hover:text-rose-300 transition-colors"
+                className="min-h-[40px] min-w-[40px] rounded-xl bg-zinc-800 hover:bg-rose-950/70 border border-zinc-700 hover:border-rose-500/50 flex items-center justify-center text-zinc-400 hover:text-rose-300 cartoon-btn-shadow transition-transform active:scale-95"
                 aria-label="ออกจากห้อง"
               >
                 <LogOut className="w-4 h-4" />
@@ -812,22 +816,22 @@ export default function App() {
         {/* Phase Countdown Progress Bar */}
         {roomState && roomState.totalSeconds > 0 && (
           <div className="max-w-md mx-auto mt-2">
-            <div className="flex items-center justify-between text-xs mb-1">
-              <span className="text-slate-400">
+            <div className="flex items-center justify-between text-xs mb-1 font-bold">
+              <span className="text-zinc-400">
                 {roomState.dayCount > 0 ? `คืน/วันที่ ${roomState.dayCount}` : 'เตรียมพร้อม'} ·{' '}
                 {PHASE_LABELS_TH[roomState.phase]}
               </span>
               <span
-                className={`font-mono-num font-bold ${
+                className={`font-mono-num font-black ${
                   roomState.remainingSeconds <= 5
                     ? 'text-rose-400 animate-pulse'
-                    : 'text-purple-200'
+                    : 'text-amber-400'
                 }`}
               >
                 {roomState.remainingSeconds} วินาที
               </span>
             </div>
-            <div className="w-full h-1.5 rounded-full bg-slate-900 overflow-hidden">
+            <div className="w-full h-2 rounded-full bg-zinc-900 border border-zinc-800 overflow-hidden">
               <div
                 className={`h-full transition-all duration-500 ${
                   roomState.remainingSeconds <= 5
@@ -837,9 +841,9 @@ export default function App() {
                     : roomState.phase === 'NIGHT_BODYGUARD'
                     ? 'bg-emerald-500'
                     : roomState.phase === 'NIGHT_SEER'
-                    ? 'bg-purple-500'
+                    ? 'bg-amber-500'
                     : roomState.phase === 'NIGHT_WITCH'
-                    ? 'bg-fuchsia-500'
+                    ? 'bg-teal-500'
                     : 'bg-amber-400'
                 }`}
                 style={{ width: `${timerPercentage}%` }}
@@ -871,31 +875,31 @@ export default function App() {
             VIEW 0: ENTRY GATE (NO ROOM JOINED YET)
            =================================================================== */}
         {!roomState && (
-          <div className="my-auto space-y-5 py-2">
-            {/* Hero Title Card */}
-            <div className="rounded-2xl bg-gradient-to-b from-[#10172a] to-[#0a0f1d] border border-slate-800/90 p-6 text-center shadow-2xl space-y-3">
-              <div className="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-400/30 mx-auto flex items-center justify-center shadow-lg shadow-purple-950/50">
-                <Moon className="w-8 h-8 text-purple-300" />
+          <div className="my-auto space-y-4 py-2">
+            {/* Hero Title Card (Comic Charcoal Tabletop Aesthetic) */}
+            <div className="rounded-2xl bg-[#14161c] border-2 border-zinc-850 p-6 text-center cartoon-card-shadow space-y-3">
+              <div className="w-16 h-16 rounded-2xl bg-zinc-800 border-2 border-zinc-750 mx-auto flex items-center justify-center cartoon-btn-shadow text-amber-400">
+                <Moon className="w-8 h-8 text-amber-400 stroke-[2.2]" />
               </div>
               <div className="space-y-1">
-                <h1 className="font-display text-2xl font-bold tracking-wider text-white">
+                <h1 className="font-display text-2xl font-black tracking-wider text-white">
                   MOONWOLF
                 </h1>
-                <p className="text-sm font-medium text-purple-300">
+                <p className="text-xs font-bold text-amber-400">
                   จันทราหมาป่า · โซเชียลดีดักชัน 4–12 ผู้เล่น
                 </p>
               </div>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                ระบบผู้ดำเนินเกมด้วยเสียงภาษาไทยอัตโนมัติ (No Human GM) รองรับ 4–12 ผู้เล่น พร้อม 8 บทบาทพิเศษ และระบบแนะนำสัดส่วนโรลอัจฉริยะ
+              <p className="text-xs text-zinc-300 leading-relaxed font-medium">
+                เกมการ์ดหมาป่าแบบบอร์ดเกมแท้ เล่นกับเพื่อนผ่านมือถือได้ทันที พร้อมระบบผู้ดำเนินเกมอัตโนมัติเสียงไทย (No Human GM)
               </p>
             </div>
 
             {/* Nickname & Room Controls */}
-            <div className="rounded-2xl bg-[#0c1222]/90 border border-slate-800 p-5 space-y-4 shadow-xl">
+            <div className="rounded-2xl bg-[#14161c] border-2 border-zinc-850 p-5 space-y-4 cartoon-card-shadow">
               <div>
                 <label
                   htmlFor="nickname-input"
-                  className="block text-xs font-medium text-slate-300 mb-1.5"
+                  className="block text-xs font-bold text-zinc-300 mb-1.5"
                 >
                   ชื่อเล่นของคุณในหมู่บ้าน
                 </label>
@@ -905,8 +909,8 @@ export default function App() {
                   maxLength={20}
                   value={playerName}
                   onChange={(e) => setPlayerName(e.target.value)}
-                  placeholder="เช่น อัศวินจันทรา, แม่หมอมีนา..."
-                  className="w-full min-h-[48px] px-4 rounded-xl bg-[#070a12] border border-slate-700/80 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-colors"
+                  placeholder="เช่น อัศวินจันทรา, ผู้กองมีนา..."
+                  className="w-full min-h-[48px] px-4 rounded-xl bg-[#0e1014] border-2 border-zinc-700/80 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 transition-colors"
                 />
               </div>
 
@@ -914,18 +918,18 @@ export default function App() {
                 type="button"
                 disabled={isSubmitting}
                 onClick={handleCreateRoom}
-                className="w-full min-h-[50px] rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-[0.99] text-white font-semibold text-sm shadow-lg shadow-purple-950/60 flex items-center justify-center gap-2 transition-all"
+                className="w-full min-h-[50px] rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-zinc-950 font-black text-sm cartoon-btn-shadow flex items-center justify-center gap-2 transition-transform"
               >
-                <Sparkles className="w-4 h-4" />
+                <Sparkles className="w-4 h-4 text-zinc-950 stroke-[2.5]" />
                 <span>สร้างห้องใหม่ (Create Room)</span>
               </button>
 
               <div className="relative flex py-1 items-center">
-                <div className="flex-grow border-t border-slate-800" />
-                <span className="flex-shrink mx-3 text-[11px] text-slate-500">
+                <div className="flex-grow border-t-2 border-zinc-800" />
+                <span className="flex-shrink mx-3 text-[11px] text-zinc-400 font-bold">
                   หรือเข้าร่วมห้องของเพื่อน
                 </span>
-                <div className="flex-grow border-t border-slate-800" />
+                <div className="flex-grow border-t-2 border-zinc-800" />
               </div>
 
               <div className="flex gap-2">
@@ -935,13 +939,13 @@ export default function App() {
                   value={joinRoomInput}
                   onChange={(e) => setJoinRoomInput(e.target.value.toUpperCase())}
                   placeholder="รหัสห้อง เช่น MW8821"
-                  className="flex-1 min-h-[48px] px-3.5 rounded-xl bg-[#070a12] border border-slate-700/80 font-mono-num uppercase text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                  className="flex-1 min-h-[48px] px-3.5 rounded-xl bg-[#0e1014] border-2 border-zinc-700/80 font-mono-num uppercase text-sm font-bold text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
                 />
                 <button
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => handleJoinRoom()}
-                  className="min-h-[48px] px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-semibold text-white transition-colors"
+                  className="min-h-[48px] px-5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-sm font-black text-white cartoon-btn-shadow transition-colors"
                 >
                   เข้าร่วม
                 </button>
@@ -953,9 +957,9 @@ export default function App() {
                   soundEngine.unlockAudioAndSpeech();
                   setIsScannerOpen(true);
                 }}
-                className="w-full min-h-[48px] rounded-xl bg-slate-900 hover:bg-slate-800/90 border border-slate-700/80 text-xs font-medium text-purple-200 flex items-center justify-center gap-2 transition-colors"
+                className="w-full min-h-[48px] rounded-xl bg-zinc-800/80 hover:bg-zinc-750 border-2 border-zinc-700 text-xs font-bold text-zinc-200 cartoon-btn-shadow flex items-center justify-center gap-2 transition-colors"
               >
-                <QrCode className="w-4 h-4 text-purple-400" />
+                <QrCode className="w-4 h-4 text-amber-400" />
                 <span>สแกน QR Code ด้วยกล้องเพื่อเข้าห้องทันที</span>
               </button>
             </div>
@@ -966,9 +970,9 @@ export default function App() {
             GM NARRATION SUBTITLE BANNER (ACTIVE DURING MATCH)
            =================================================================== */}
         {roomState && roomState.phase !== 'LOBBY' && roomState.lastNarration && (
-          <div className="rounded-xl bg-[#0d1326]/95 border border-purple-500/30 px-3.5 py-2.5 flex items-start gap-2.5 shadow-md">
-            <Volume2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-            <p className="text-xs text-slate-200 leading-relaxed">
+          <div className="rounded-xl bg-[#14161c] border-2 border-zinc-800 px-3.5 py-2.5 flex items-start gap-2.5 cartoon-card-shadow">
+            <Volume2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <p className="text-xs text-zinc-200 leading-relaxed font-medium">
               “{roomState.lastNarration.text}”
             </p>
           </div>
@@ -983,7 +987,7 @@ export default function App() {
           roomState.phase !== 'GAME_OVER' &&
           myRole && (
             <div className="space-y-2">
-              <div className="rounded-xl bg-[#0c1222]/90 border border-slate-800 px-3.5 py-2.5 flex items-center justify-between gap-2">
+              <div className="rounded-xl bg-[#14161c] border-2 border-zinc-800 px-3.5 py-2.5 flex items-center justify-between gap-2 cartoon-card-shadow">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div
                     className={`w-2.5 h-2.5 rounded-full shrink-0 ${
@@ -995,22 +999,22 @@ export default function App() {
                     }`}
                   />
                   <div className="truncate">
-                    <span className="text-[11px] text-slate-400 mr-1.5">
+                    <span className="text-[11px] text-zinc-400 mr-1.5 font-bold">
                       บทบาทของคุณ:
                     </span>
                     <span
-                      className={`text-xs font-semibold ${
+                      className={`text-xs font-black ${
                         myRole.faction === 'WEREWOLF'
                           ? 'text-rose-400'
                           : myRole.faction === 'NEUTRAL'
-                          ? 'text-amber-300'
-                          : 'text-purple-200'
+                          ? 'text-amber-400'
+                          : 'text-emerald-400'
                       }`}
                     >
                       {myRole.roleNameTh}
                     </span>
                     {me && !me.isAlive && (
-                      <span className="ml-2 text-[11px] text-rose-400 font-medium">
+                      <span className="ml-2 text-[11px] text-rose-400 font-bold">
                         (เสียชีวิตแล้ว)
                       </span>
                     )}
@@ -1021,7 +1025,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => setShowSeerNotebook((v) => !v)}
-                    className="min-h-[34px] px-2.5 rounded-lg bg-purple-950/70 border border-purple-500/40 text-[11px] text-purple-200 flex items-center gap-1"
+                    className="min-h-[34px] px-2.5 rounded-lg bg-zinc-800 border border-zinc-700 text-[11px] font-bold text-amber-300 cartoon-btn-shadow flex items-center gap-1"
                   >
                     {showSeerNotebook ? (
                       <EyeOff className="w-3.5 h-3.5" />
@@ -1094,36 +1098,36 @@ export default function App() {
 
         {/* Collapsible Seer Investigation Notebook */}
         {showSeerNotebook && myRole?.role === 'SEER' && (
-          <div className="rounded-xl bg-[#110c24] border border-purple-500/40 p-3.5 space-y-2 text-xs">
+          <div className="rounded-xl bg-[#14161c] border-2 border-zinc-800 p-3.5 space-y-2 text-xs cartoon-card-shadow">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-purple-200">
+              <span className="font-bold text-amber-400">
                 บันทึกเนตรหยั่งรู้ (ส่วนตัวเฉพาะแม่หมอ)
               </span>
               <button
                 type="button"
                 onClick={() => setShowSeerNotebook(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-zinc-400 hover:text-white font-bold"
               >
                 ซ่อน
               </button>
             </div>
             {!myRole.seerHistory || myRole.seerHistory.length === 0 ? (
-              <p className="text-slate-400">ยังไม่มีประวัติการตรวจสอบในเกมนี้</p>
+              <p className="text-zinc-400 font-medium">ยังไม่มีประวัติการตรวจสอบในเกมนี้</p>
             ) : (
               <div className="space-y-1.5">
                 {myRole.seerHistory.map((item) => (
                   <div
                     key={`${item.night}-${item.targetId}`}
-                    className="flex items-center justify-between rounded-lg bg-black/40 px-3 py-1.5 border border-white/5"
+                    className="flex items-center justify-between rounded-lg bg-[#101216] px-3 py-1.5 border border-zinc-700/80"
                   >
-                    <span className="text-slate-300">
-                      คืนที่ {item.night}: <strong>{item.targetName}</strong>
+                    <span className="text-zinc-300 font-medium">
+                      คืนที่ {item.night}: <strong className="text-white">{item.targetName}</strong>
                     </span>
                     <span
                       className={
                         item.isWerewolf
-                          ? 'text-rose-400 font-semibold'
-                          : 'text-emerald-400 font-semibold'
+                          ? 'text-rose-400 font-bold'
+                          : 'text-emerald-400 font-bold'
                       }
                     >
                       {item.isWerewolf ? '🐺 มนุษย์หมาป่า' : '🛡️ ไม่ใช่หมาป่า'}
@@ -1154,15 +1158,15 @@ export default function App() {
             />
 
             {/* Player Slots List */}
-            <div className="rounded-2xl bg-[#0c1222]/90 border border-slate-800 p-4 space-y-3">
+            <div className="rounded-2xl bg-[#14161c] border-2 border-zinc-800 p-4 space-y-3 cartoon-card-shadow">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-purple-400" />
-                  <h2 className="text-sm font-semibold text-white">
+                  <Users className="w-4 h-4 text-amber-400" />
+                  <h2 className="text-sm font-bold text-white">
                     รายชื่อผู้เล่นในหมู่บ้าน
                   </h2>
                 </div>
-                <span className="font-mono-num text-xs font-semibold text-purple-300">
+                <span className="font-mono-num text-xs font-black text-amber-400">
                   {roomState.players.length} / {roomState.targetPlayerCount} คน
                 </span>
               </div>
@@ -1174,23 +1178,23 @@ export default function App() {
                     return (
                       <div
                         key={slotPlayer ? slotPlayer.id : `empty-${index}`}
-                        className={`min-h-[48px] rounded-xl px-3.5 py-2 border flex items-center justify-between ${
+                        className={`min-h-[48px] rounded-xl px-3.5 py-2 border-2 flex items-center justify-between ${
                           slotPlayer
-                            ? 'bg-[#090e1c] border-slate-700/80 text-slate-100'
-                            : 'bg-[#070a12]/60 border-dashed border-slate-800 text-slate-500'
+                            ? 'bg-[#101216] border-zinc-700/80 text-zinc-100 cartoon-card-shadow'
+                            : 'bg-[#0c0e12]/60 border-dashed border-zinc-800 text-zinc-500'
                         }`}
                       >
                         {slotPlayer ? (
                           <>
                             <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-500/30 flex items-center justify-center font-mono-num text-xs font-bold text-purple-300">
+                              <div className="w-7 h-7 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center font-mono-num text-xs font-black text-amber-400">
                                 {index + 1}
                               </div>
-                              <span className="text-sm font-medium truncate">
+                              <span className="text-sm font-bold truncate">
                                 {slotPlayer.name}
                               </span>
                               {slotPlayer.id === playerToken && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-600/30 text-purple-200 border border-purple-500/30">
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold">
                                   คุณ
                                 </span>
                               )}
@@ -1198,21 +1202,21 @@ export default function App() {
 
                             <div className="flex items-center gap-1.5">
                               {slotPlayer.isSimulated && (
-                                <span className="text-[11px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">
+                                <span className="text-[11px] px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-300 font-bold">
                                   AI จำลอง
                                 </span>
                               )}
                               {slotPlayer.isHost && (
-                                <span className="text-[11px] px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
-                                  <Crown className="w-3 h-3" />
+                                <span className="text-[11px] px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-bold">
+                                  <Crown className="w-3 h-3 text-amber-400" />
                                   Host
                                 </span>
                               )}
                             </div>
                           </>
                         ) : (
-                          <div className="flex items-center gap-2.5 text-xs">
-                            <div className="w-7 h-7 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center font-mono-num text-slate-600">
+                          <div className="flex items-center gap-2.5 text-xs font-medium">
+                            <div className="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center font-mono-num text-zinc-600">
                               {index + 1}
                             </div>
                             <span>กำลังรอผู้เล่นเข้าร่วม...</span>
@@ -1226,8 +1230,8 @@ export default function App() {
 
               {/* Host Controls for Filling Empty Slots with Simulated Players */}
               {me?.isHost && (
-                <div className="pt-2 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-[11px] text-slate-400">
+                <div className="pt-2 border-t border-zinc-800 flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-[11px] text-zinc-400 font-medium">
                     เพื่อนไม่ครบ? เติมผู้เล่นจำลองอัตโนมัติได้:
                   </span>
                   <div className="flex items-center gap-1.5">
@@ -1235,9 +1239,9 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => handleManageBots('FILL_TO_TARGET')}
-                        className="min-h-[38px] px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-purple-200 flex items-center gap-1.5 transition-colors"
+                        className="min-h-[38px] px-3 rounded-lg bg-zinc-800 hover:bg-zinc-750 text-xs font-bold text-zinc-200 cartoon-btn-shadow flex items-center gap-1.5 transition-colors"
                       >
-                        <UserPlus className="w-3.5 h-3.5" />
+                        <UserPlus className="w-3.5 h-3.5 text-amber-400" />
                         <span>
                           เติม AI ให้ครบ {roomState.targetPlayerCount} คน
                         </span>
@@ -1247,7 +1251,7 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => handleManageBots('CLEAR_ALL')}
-                        className="min-h-[38px] px-2.5 rounded-lg bg-slate-900 hover:bg-rose-950/50 border border-slate-800 text-xs text-slate-400 hover:text-rose-300 transition-colors"
+                        className="min-h-[38px] px-2.5 rounded-lg bg-zinc-850 hover:bg-rose-950/60 border border-zinc-750 text-xs text-zinc-400 hover:text-rose-300 transition-colors"
                       >
                         ลบ AI ออก
                       </button>
@@ -1267,15 +1271,15 @@ export default function App() {
                   (roomState.roleConfig.WEREWOLF || 0) < 1
                 }
                 onClick={handleStartGame}
-                className={`w-full min-h-[54px] rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 shadow-xl transition-all ${
+                className={`w-full min-h-[54px] rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-xl transition-all ${
                   roomState.players.length === roomState.targetPlayerCount &&
                   totalConfiguredRoles === roomState.targetPlayerCount &&
                   (roomState.roleConfig.WEREWOLF || 0) >= 1
-                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-950/60 cursor-pointer'
-                    : 'bg-slate-900 border border-slate-800 text-slate-500 cursor-not-allowed'
+                    ? 'bg-amber-500 hover:bg-amber-400 text-zinc-950 cartoon-btn-shadow cursor-pointer'
+                    : 'bg-zinc-850 border border-zinc-800 text-zinc-500 cursor-not-allowed'
                 }`}
               >
-                <Sparkles className="w-4 h-4" />
+                <Sparkles className="w-4 h-4 text-zinc-950 stroke-[2.5]" />
                 <span>
                   {roomState.players.length !== roomState.targetPlayerCount
                     ? `รอผู้เล่นให้ครบ ${roomState.targetPlayerCount} คน (${roomState.players.length}/${roomState.targetPlayerCount})`
@@ -1561,41 +1565,41 @@ export default function App() {
                 )}
               </div>
             ) : roomState.phase === 'NIGHT_SEER' && myRole.role === 'SEER' ? (
-              /* SEER TURN (STEP 3) */
-              <div className="rounded-2xl bg-gradient-to-b from-[#150d2a] to-[#0b0718] border border-purple-500/40 p-5 space-y-4 shadow-2xl">
+              /* SEER TURN (STEP 3) - CARTOON CHARCOAL & AMBER */
+              <div className="rounded-2xl bg-[#14161c] border-2 border-amber-500/80 p-5 space-y-4 cartoon-card-shadow">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Eye className="w-5 h-5 text-purple-300" />
-                    <h2 className="text-base font-bold text-purple-100">
+                    <Eye className="w-5 h-5 text-amber-400" />
+                    <h2 className="text-base font-black text-white">
                       ตาของผู้หยั่งรู้ · ตรวจสอบตัวตน
                     </h2>
                   </div>
-                  <span className="text-[11px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-200 border border-purple-500/30">
+                  <span className="text-[11px] px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold">
                     ฝ่ายชาวบ้าน
                   </span>
                 </div>
 
-                <p className="text-xs text-purple-200/80">
-                  เลือกผู้เล่น 1 คนเพื่อใช้ลูกแก้วพยากรณ์ตรวจสอบว่าเขาเป็นมนุษย์หมาป่าหรือไม่
+                <p className="text-xs text-zinc-300 font-medium">
+                  เลือกผู้เล่น 1 คนเพื่อใช้เนตรพยากรณ์ตรวจสอบว่าเขาเป็นมนุษย์หมาป่าหรือไม่
                 </p>
 
                 {myRole.hasActedNight && latestSeerResult ? (
                   <div className="space-y-3">
                     <div
-                      className={`rounded-xl p-4 border text-center space-y-2 ${
+                      className={`rounded-xl p-4 border-2 text-center space-y-2 cartoon-card-shadow ${
                         latestSeerResult.isWerewolf
-                          ? 'bg-rose-950/70 border-rose-500/60'
-                          : 'bg-emerald-950/60 border-emerald-500/50'
+                          ? 'bg-rose-950/70 border-rose-500/80'
+                          : 'bg-emerald-950/70 border-emerald-500/80'
                       }`}
                     >
-                      <p className="text-xs text-slate-300">
+                      <p className="text-xs text-zinc-300">
                         ผลการพยากรณ์ตัวตนของ{' '}
                         <strong className="text-white">
                           {latestSeerResult.targetName}
                         </strong>
                       </p>
                       <p
-                        className={`text-base font-bold ${
+                        className={`text-base font-black ${
                           latestSeerResult.isWerewolf
                             ? 'text-rose-300'
                             : 'text-emerald-300'
@@ -1610,7 +1614,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={handleReadyForNextPhase}
-                      className="w-full min-h-[48px] rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition-colors"
+                      className="w-full min-h-[48px] rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black text-xs cartoon-btn-shadow transition-transform active:scale-95"
                     >
                       จำผลพยากรณ์แล้ว · ไปยังช่วงถัดไปทันที
                     </button>
@@ -1627,20 +1631,20 @@ export default function App() {
                               key={target.id}
                               type="button"
                               onClick={() => setSelectedNightTargetId(target.id)}
-                              className={`min-h-[48px] rounded-xl px-4 py-2.5 border text-left flex items-center justify-between transition-all ${
+                              className={`min-h-[48px] rounded-xl px-4 py-2.5 border-2 text-left flex items-center justify-between transition-all ${
                                 isSelected
-                                  ? 'bg-purple-600/25 border-purple-400 text-white shadow-md shadow-purple-950/50'
-                                  : 'bg-black/40 border-purple-900/40 text-slate-200 hover:border-purple-500/40'
+                                  ? 'bg-amber-500/20 border-amber-400 text-white shadow-md'
+                                  : 'bg-[#101216] border-zinc-750 text-zinc-200 hover:border-amber-500/50'
                               }`}
                             >
-                              <span className="text-sm font-medium">
+                              <span className="text-sm font-bold">
                                 {target.name}
                               </span>
                               <span
-                                className={`text-xs px-2.5 py-1 rounded-lg ${
+                                className={`text-xs px-2.5 py-1 rounded-lg font-bold ${
                                   isSelected
-                                    ? 'bg-purple-500 text-white font-semibold'
-                                    : 'bg-purple-950/60 text-purple-300'
+                                    ? 'bg-amber-500 text-zinc-950'
+                                    : 'bg-zinc-800 text-amber-300'
                                 }`}
                               >
                                 {isSelected ? 'เลือกตรวจสอบ' : 'ส่องดูตัวตน'}
@@ -1654,10 +1658,10 @@ export default function App() {
                       type="button"
                       disabled={!selectedNightTargetId}
                       onClick={handleSubmitSeerCheck}
-                      className={`w-full min-h-[50px] rounded-xl font-semibold text-sm transition-all ${
+                      className={`w-full min-h-[50px] rounded-xl font-black text-sm cartoon-btn-shadow transition-transform ${
                         selectedNightTargetId
-                          ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-950/70'
-                          : 'bg-slate-900 text-slate-500 border border-slate-800 cursor-not-allowed'
+                          ? 'bg-amber-500 hover:bg-amber-400 text-zinc-950 active:scale-95'
+                          : 'bg-zinc-850 text-zinc-500 border border-zinc-800 cursor-not-allowed'
                       }`}
                     >
                       ยืนยันการตรวจสอบตัวตน
@@ -1666,30 +1670,30 @@ export default function App() {
                 )}
               </div>
             ) : roomState.phase === 'NIGHT_WITCH' && myRole.role === 'WITCH' ? (
-              /* WITCH TURN (STEP 4) */
-              <div className="rounded-2xl bg-gradient-to-b from-[#1e0b2b] to-[#0d0614] border border-fuchsia-500/40 p-5 space-y-4 shadow-2xl">
+              /* WITCH TURN (STEP 4) - CARTOON CHARCOAL & EMERALD */
+              <div className="rounded-2xl bg-[#14161c] border-2 border-emerald-500/80 p-5 space-y-4 cartoon-card-shadow">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <FlaskConical className="w-5 h-5 text-fuchsia-300" />
-                    <h2 className="text-base font-bold text-fuchsia-100">
+                    <FlaskConical className="w-5 h-5 text-emerald-400" />
+                    <h2 className="text-base font-black text-white">
                       ตาของแม่มด · เลือกใช้น้ำยาวิเศษ
                     </h2>
                   </div>
                   <div className="flex items-center gap-1.5 text-[10px]">
                     <span
-                      className={`px-2 py-0.5 rounded border ${
+                      className={`px-2 py-0.5 rounded-md border font-bold ${
                         myRole.witchHealAvailable
-                          ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300'
-                          : 'bg-slate-900 border-slate-800 text-slate-500 line-through'
+                          ? 'bg-emerald-950/80 border-emerald-500/60 text-emerald-300'
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-500 line-through'
                       }`}
                     >
                       ยาชุบชีวิต
                     </span>
                     <span
-                      className={`px-2 py-0.5 rounded border ${
+                      className={`px-2 py-0.5 rounded-md border font-bold ${
                         myRole.witchPoisonAvailable
-                          ? 'bg-rose-950/60 border-rose-500/40 text-rose-300'
-                          : 'bg-slate-900 border-slate-800 text-slate-500 line-through'
+                          ? 'bg-rose-950/80 border-rose-500/60 text-rose-300'
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-500 line-through'
                       }`}
                     >
                       ยาพิษ
@@ -1698,32 +1702,32 @@ export default function App() {
                 </div>
 
                 {confirmedWitchMessage || myRole.hasActedNight ? (
-                  <div className="rounded-xl bg-fuchsia-950/60 border border-fuchsia-500/50 p-4 text-center space-y-1.5">
-                    <FlaskConical className="w-6 h-6 text-fuchsia-300 mx-auto" />
-                    <p className="text-sm font-semibold text-white">
+                  <div className="rounded-xl bg-[#101216] border-2 border-emerald-500/60 p-4 text-center space-y-1.5 cartoon-card-shadow">
+                    <FlaskConical className="w-6 h-6 text-emerald-400 mx-auto" />
+                    <p className="text-sm font-bold text-white">
                       {confirmedWitchMessage || 'ดำเนินการเสร็จสิ้น'}
                     </p>
-                    <p className="text-xs text-fuchsia-200/70">
+                    <p className="text-xs text-zinc-400">
                       กำลังเข้าสู่ช่วงรุ่งอรุณ...
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {/* Elixir of Life Section */}
-                    <div className="rounded-xl bg-black/40 border border-emerald-500/30 p-3.5 space-y-2.5">
+                    <div className="rounded-xl bg-[#101216] border-2 border-emerald-600/40 p-3.5 space-y-2.5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-semibold text-emerald-300">
+                        <span className="font-bold text-emerald-300">
                           🧪 ขวดที่ 1: ยาชุบชีวิต (ช่วยเหยื่อคืนนี้)
                         </span>
-                        <span className="text-[11px] text-slate-400">
+                        <span className="text-[11px] text-zinc-400 font-bold">
                           {myRole.witchHealAvailable ? 'เหลือ 1 ขวด' : 'ใช้ไปแล้ว'}
                         </span>
                       </div>
                       {myRole.witchAttackedVictim ? (
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs text-slate-200">
+                          <span className="text-xs text-zinc-200">
                             คืนนี้{' '}
-                            <strong className="text-rose-300">
+                            <strong className="text-rose-400 font-bold">
                               {myRole.witchAttackedVictim.name}
                             </strong>{' '}
                             กำลังถูกหมาป่ากัด!
@@ -1732,25 +1736,25 @@ export default function App() {
                             type="button"
                             disabled={!myRole.witchHealAvailable}
                             onClick={() => handleSubmitWitchAction('HEAL')}
-                            className="min-h-[38px] px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-xs font-semibold text-white shrink-0"
+                            className="min-h-[38px] px-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-xs font-black text-white cartoon-btn-shadow shrink-0"
                           >
                             ใช้ยาชุบชีวิตช่วย
                           </button>
                         </div>
                       ) : (
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs text-zinc-400">
                           คืนนี้ไม่มีผู้บาดเจ็บ (หรือบอดี้การ์ดป้องกันไว้แล้ว)
                         </p>
                       )}
                     </div>
 
                     {/* Poison Elixir Section */}
-                    <div className="rounded-xl bg-black/40 border border-rose-500/30 p-3.5 space-y-2.5">
+                    <div className="rounded-xl bg-[#101216] border-2 border-rose-600/40 p-3.5 space-y-2.5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-semibold text-rose-300">
+                        <span className="font-bold text-rose-300">
                           ☠️ ขวดที่ 2: ยาพิษสังหาร (เลือกสังหาร 1 คน)
                         </span>
-                        <span className="text-[11px] text-slate-400">
+                        <span className="text-[11px] text-zinc-400 font-bold">
                           {myRole.witchPoisonAvailable ? 'เหลือ 1 ขวด' : 'ใช้ไปแล้ว'}
                         </span>
                       </div>
@@ -1770,10 +1774,10 @@ export default function App() {
                                     onClick={() =>
                                       setSelectedNightTargetId(target.id)
                                     }
-                                    className={`min-h-[40px] px-2.5 py-1.5 rounded-lg border text-xs font-medium truncate transition-all ${
+                                    className={`min-h-[40px] px-2.5 py-1.5 rounded-lg border-2 text-xs font-bold truncate transition-all ${
                                       isSelected
-                                        ? 'bg-rose-600 text-white border-rose-400'
-                                        : 'bg-slate-900/90 text-slate-300 border-slate-800 hover:border-rose-500/40'
+                                        ? 'bg-rose-600 text-white border-rose-400 shadow-md'
+                                        : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:border-rose-500/50'
                                     }`}
                                   >
                                     {target.name}
@@ -1791,13 +1795,13 @@ export default function App() {
                                 selectedNightTargetId
                               )
                             }
-                            className="w-full min-h-[42px] rounded-lg bg-rose-600 hover:bg-rose-500 disabled:opacity-40 text-xs font-semibold text-white transition-colors"
+                            className="w-full min-h-[42px] rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-40 text-xs font-black text-white cartoon-btn-shadow transition-colors"
                           >
                             ยืนยันใช้ยาพิษสังหารเป้าหมาย
                           </button>
                         </>
                       ) : (
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-zinc-500">
                           คุณได้ใช้ยาพิษไปแล้วในเกมนี้
                         </p>
                       )}
@@ -1806,7 +1810,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => handleSubmitWitchAction('SKIP')}
-                      className="w-full min-h-[46px] rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition-colors"
+                      className="w-full min-h-[46px] rounded-xl bg-zinc-800 hover:bg-zinc-750 text-xs font-bold text-zinc-200 cartoon-btn-shadow transition-colors"
                     >
                       ไม่ใช้น้ำยาในคืนนี้ (เก็บไว้ใช้คืนถัดไป)
                     </button>
@@ -1815,19 +1819,18 @@ export default function App() {
               </div>
             ) : (
               /* SLEEPING SCREEN (WHEN IT IS NOT THIS PLAYER'S SUB-PHASE TURN) */
-              <div className="rounded-2xl bg-[#090d1a] border border-slate-800/90 p-7 text-center space-y-4 shadow-2xl">
+              <div className="rounded-2xl bg-[#14161c] border-2 border-zinc-800 p-7 text-center space-y-4 cartoon-card-shadow">
                 <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
-                  <div className="absolute inset-0 rounded-full bg-indigo-500/10 animate-ping" />
-                  <div className="w-16 h-16 rounded-full bg-indigo-950/80 border border-indigo-400/30 flex items-center justify-center">
-                    <Moon className="w-8 h-8 text-indigo-300 animate-pulse" />
+                  <div className="w-16 h-16 rounded-full bg-zinc-800 border-2 border-zinc-700 flex items-center justify-center cartoon-btn-shadow text-amber-400">
+                    <Moon className="w-8 h-8 text-amber-400" />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <h2 className="text-lg font-bold text-slate-100">
+                  <h2 className="text-lg font-black text-white">
                     คุณกำลังนอนหลับอย่างเงียบงัน...
                   </h2>
-                  <p className="text-xs text-purple-300 font-medium">
+                  <p className="text-xs text-amber-300 font-bold">
                     ขณะนี้เป็นช่วง:{' '}
                     {roomState.phase === 'NIGHT_WEREWOLF'
                       ? 'มนุษย์หมาป่ากำลังออกล่าเหยื่อ'
@@ -1837,7 +1840,7 @@ export default function App() {
                       ? 'ผู้หยั่งรู้ (แม่หมอ) กำลังตรวจสอบตัวตน'
                       : 'แม่มดกำลังตัดสินใจใช้น้ำยาวิเศษ'}
                   </p>
-                  <p className="text-xs text-slate-400 leading-relaxed max-w-xs mx-auto pt-1">
+                  <p className="text-xs text-zinc-400 leading-relaxed max-w-xs mx-auto pt-1 font-medium">
                     {myRole.role === 'BODYGUARD' &&
                     roomState.phase === 'NIGHT_WEREWOLF'
                       ? 'เตรียมตัวให้พร้อม! เมื่อหมาป่าเลือกเหยื่อเสร็จ จะถึงตาคุณลืมตาขึ้นมาคุ้มกัน'
@@ -1947,7 +1950,7 @@ export default function App() {
                         {p.name}
                       </span>
                       {p.id === playerToken && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-600/30 text-purple-200">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold">
                           คุณ
                         </span>
                       )}
@@ -1955,15 +1958,15 @@ export default function App() {
 
                     <div className="flex items-center gap-2 text-xs">
                       {!p.isAlive ? (
-                        <span className="text-rose-400 font-medium">
+                        <span className="text-rose-400 font-bold">
                           เสียชีวิต
                         </span>
                       ) : p.isReadyForNext ? (
-                        <span className="text-emerald-400 text-[11px]">
+                        <span className="text-emerald-400 text-[11px] font-bold">
                           พร้อมโหวต ✓
                         </span>
                       ) : (
-                        <span className="text-slate-400 text-[11px]">
+                        <span className="text-zinc-400 text-[11px] font-medium">
                           กำลังอภิปราย
                         </span>
                       )}
@@ -1977,13 +1980,13 @@ export default function App() {
                   type="button"
                   disabled={me.isReadyForNext}
                   onClick={handleReadyForNextPhase}
-                  className={`w-full min-h-[48px] rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-colors ${
+                  className={`w-full min-h-[48px] rounded-xl text-xs font-black flex items-center justify-center gap-2 transition-transform ${
                     me.isReadyForNext
-                      ? 'bg-emerald-950/50 border border-emerald-500/40 text-emerald-300'
-                      : 'bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-950/50'
+                      ? 'bg-emerald-950/80 border-2 border-emerald-500/60 text-emerald-300'
+                      : 'bg-amber-500 hover:bg-amber-400 text-zinc-950 cartoon-btn-shadow active:scale-95'
                   }`}
                 >
-                  <Vote className="w-4 h-4" />
+                  <Vote className="w-4 h-4 stroke-[2.5]" />
                   <span>
                     {me.isReadyForNext
                       ? 'ยืนยันพร้อมโหวตแล้ว (กำลังรอผู้เล่นอื่น...)'
@@ -2192,8 +2195,8 @@ export default function App() {
             </div>
 
             {/* Full True Identity Reveal Table */}
-            <div className="rounded-2xl bg-[#0c1222]/90 border border-slate-800 p-4 space-y-3">
-              <h3 className="text-xs font-semibold text-purple-200 uppercase tracking-wider">
+            <div className="rounded-2xl bg-[#14161c] border-2 border-zinc-800 p-4 space-y-3 cartoon-card-shadow">
+              <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider">
                 เปิดเผยตัวตนที่แท้จริงของผู้เล่นทั้งหมด ({roomState.players.length} คน)
               </h3>
 
@@ -2205,21 +2208,21 @@ export default function App() {
                   return (
                     <div
                       key={p.id}
-                      className={`rounded-xl px-3.5 py-2.5 border flex items-center justify-between ${
+                      className={`rounded-xl px-3.5 py-2.5 border-2 flex items-center justify-between ${
                         isEvil
-                          ? 'bg-rose-950/25 border-rose-500/40'
+                          ? 'bg-rose-950/40 border-rose-600/60'
                           : isFool
-                          ? 'bg-amber-950/25 border-amber-500/40'
-                          : 'bg-[#080d1a] border-slate-800'
+                          ? 'bg-amber-950/40 border-amber-500/60'
+                          : 'bg-[#101216] border-zinc-800'
                       }`}
                     >
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-white">
+                          <span className="text-sm font-bold text-white">
                             {p.name}
                           </span>
                           <span
-                            className={`text-[10px] px-1.5 py-0.5 rounded ${
+                            className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
                               p.isAlive
                                 ? 'bg-emerald-500/20 text-emerald-300'
                                 : 'bg-rose-500/20 text-rose-300'
@@ -2236,7 +2239,7 @@ export default function App() {
                             ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
                             : isFool
                             ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                            : 'bg-purple-500/20 text-purple-200 border border-purple-500/30'
+                            : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
                         }`}
                       >
                         {p.revealedRoleNameTh || p.revealedRole}
@@ -2250,9 +2253,9 @@ export default function App() {
             <button
               type="button"
               onClick={handleRestartLobby}
-              className="w-full min-h-[52px] rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-xl"
+              className="w-full min-h-[52px] rounded-2xl bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black text-sm cartoon-btn-shadow flex items-center justify-center gap-2 transition-transform active:scale-95"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-4 h-4 text-zinc-950 stroke-[2.5]" />
               <span>กลับสู่ห้องเตรียมตัว (ปรับโรล / เริ่มเกมใหม่)</span>
             </button>
           </div>

@@ -9,31 +9,32 @@ interface InlineRoomQrCodeProps {
 
 export const InlineRoomQrCode: React.FC<InlineRoomQrCodeProps> = ({ roomCode }) => {
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
-  const [copiedUrl, setCopiedUrl] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [copiedUrl, setCopiedUrl] = useState(false);
 
   const joinUrl =
     typeof window !== 'undefined'
-      ? `${window.location.origin}/?room=${encodeURIComponent(roomCode)}`
-      : `https://moonwolf.app/?room=${roomCode}`;
+      ? `${window.location.origin}/?join=${encodeURIComponent(roomCode)}`
+      : `/?join=${roomCode}`;
 
   useEffect(() => {
-    let active = true;
+    let isCurrent = true;
     QRCode.toDataURL(joinUrl, {
-      width: 220,
-      margin: 2,
+      width: 256,
+      margin: 1.5,
       color: {
-        dark: '#070a12',
-        light: '#f8fafc',
+        dark: '#101216',
+        light: '#ffffff',
       },
       errorCorrectionLevel: 'M',
     })
       .then((url) => {
-        if (active) setQrDataUrl(url);
+        if (isCurrent) setQrDataUrl(url);
       })
       .catch(() => {});
+
     return () => {
-      active = false;
+      isCurrent = false;
     };
   }, [joinUrl]);
 
@@ -50,18 +51,18 @@ export const InlineRoomQrCode: React.FC<InlineRoomQrCodeProps> = ({ roomCode }) 
   };
 
   return (
-    <div className="rounded-2xl bg-[#0e1424] border border-slate-800 p-4 flex flex-col items-center gap-3">
-      <div className="w-full flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+    <div className="rounded-2xl bg-[#14161c] border-2 border-zinc-800 p-4 flex flex-col items-center gap-3 cartoon-card-shadow">
+      <div className="w-full flex items-center justify-between border-b border-zinc-800 pb-2.5">
         <div className="text-left">
-          <p className="text-xs text-slate-400">รหัสห้องหมู่บ้าน (6 หลัก)</p>
-          <p className="text-2xl font-mono-num font-bold tracking-widest text-purple-300">
+          <p className="text-xs text-zinc-400 font-bold">รหัสห้องหมู่บ้าน (6 หลัก)</p>
+          <p className="text-2xl font-mono-num font-black tracking-widest text-amber-400">
             {roomCode}
           </p>
         </div>
         <button
           type="button"
           onClick={handleCopyCode}
-          className="min-h-[44px] px-3.5 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
+          className="min-h-[44px] px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-bold text-zinc-200 cartoon-btn-shadow flex items-center gap-1.5 transition-transform active:scale-95 whitespace-nowrap shrink-0"
         >
           {copiedCode ? (
             <>
@@ -70,7 +71,7 @@ export const InlineRoomQrCode: React.FC<InlineRoomQrCodeProps> = ({ roomCode }) 
             </>
           ) : (
             <>
-              <Copy className="w-4 h-4 text-slate-400" />
+              <Copy className="w-4 h-4 text-zinc-400" />
               <span>คัดลอกรหัส</span>
             </>
           )}
@@ -79,7 +80,7 @@ export const InlineRoomQrCode: React.FC<InlineRoomQrCodeProps> = ({ roomCode }) 
 
       {/* Crisp Inline QR Code */}
       <div className="flex flex-col sm:flex-row items-center gap-4 w-full pt-1">
-        <div className="p-2.5 bg-slate-50 rounded-xl shadow-inner shrink-0">
+        <div className="p-2.5 bg-white rounded-xl shadow-inner shrink-0 border-2 border-zinc-700">
           {qrDataUrl ? (
             <img
               src={qrDataUrl}
@@ -88,29 +89,29 @@ export const InlineRoomQrCode: React.FC<InlineRoomQrCodeProps> = ({ roomCode }) 
               className="w-36 h-36 object-contain rounded-lg"
             />
           ) : (
-            <div className="w-36 h-36 flex items-center justify-center bg-slate-100 rounded-lg text-slate-500">
+            <div className="w-36 h-36 flex items-center justify-center bg-zinc-100 rounded-lg text-zinc-500">
               <QrCode className="w-8 h-8" />
             </div>
           )}
         </div>
 
         <div className="flex-1 text-center sm:text-left space-y-2.5">
-          <p className="text-xs text-slate-300 leading-relaxed">
-            ให้เพื่อนผู้เล่นคนที่ 2–5 ใช้กล้องมือถือสแกน QR Code นี้ หรือกดคัดลอกลิงก์ด้านล่างส่งให้เพื่อนเพื่อเข้าห้องทันที
+          <p className="text-xs text-zinc-300 leading-relaxed font-medium">
+            ให้เพื่อนใช้กล้องมือถือสแกน QR Code นี้ หรือกดคัดลอกลิงก์ส่งเข้ากลุ่มแชทเพื่อเข้าห้องทันที
           </p>
           <button
             type="button"
             onClick={handleCopyUrl}
-            className="w-full min-h-[44px] px-3.5 py-2 rounded-xl bg-purple-950/60 hover:bg-purple-900/60 border border-purple-500/30 text-xs font-medium text-purple-200 flex items-center justify-center sm:justify-start gap-2 transition-colors whitespace-nowrap"
+            className="w-full min-h-[44px] px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black text-xs cartoon-btn-shadow flex items-center justify-center sm:justify-start gap-2 transition-transform active:scale-95 whitespace-nowrap"
           >
             {copiedUrl ? (
               <>
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                <Check className="w-4 h-4 text-zinc-950 stroke-[3] shrink-0" />
                 <span className="truncate">คัดลอกลิงก์ชวนเพื่อนแล้ว!</span>
               </>
             ) : (
               <>
-                <Copy className="w-4 h-4 text-purple-300 shrink-0" />
+                <Copy className="w-4 h-4 text-zinc-950 stroke-[2.5] shrink-0" />
                 <span className="truncate">คัดลอกลิงก์ชวนเข้าห้อง</span>
               </>
             )}
@@ -138,13 +139,12 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
 
   useEffect(() => {
     if (!isOpen) return;
-    setErrorMsg(null);
 
     let isMounted = true;
-    const html5QrCode = new Html5Qrcode(containerId);
-    scannerRef.current = html5QrCode;
+    const scanner = new Html5Qrcode(containerId);
+    scannerRef.current = scanner;
 
-    html5QrCode
+    scanner
       .start(
         { facingMode: 'environment' },
         {
@@ -153,29 +153,28 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
         },
         (decodedText) => {
           if (!isMounted) return;
-          let extractedCode = decodedText.trim();
           try {
             const url = new URL(decodedText);
-            const paramRoom = url.searchParams.get('room');
-            if (paramRoom) {
-              extractedCode = paramRoom.toUpperCase();
+            const codeParam = url.searchParams.get('join');
+            if (codeParam) {
+              onScanRoomCode(codeParam.trim().toUpperCase());
+              onClose();
+              return;
             }
           } catch {
-            // If raw text is 6 chars
-            extractedCode = decodedText.trim().toUpperCase();
+            // Not a full URL, maybe a raw room code
           }
 
-          if (extractedCode.length >= 4 && extractedCode.length <= 8) {
-            html5QrCode
-              .stop()
-              .catch(() => {})
-              .finally(() => {
-                onScanRoomCode(extractedCode);
-              });
+          const rawCode = decodedText.trim().toUpperCase();
+          if (/^[A-Z0-9]{6}$/.test(rawCode)) {
+            onScanRoomCode(rawCode);
+            onClose();
+          } else {
+            setErrorMsg(`ตรวจพบโค้ด "${rawCode}" แต่รูปแบบรหัสห้องไม่ถูกต้อง (ต้องมี 6 ตัวอักษร)`);
           }
         },
         () => {
-          // Ignore frame scan misses
+          // Ignore scanning frames without QR
         }
       )
       .catch(() => {
@@ -192,31 +191,31 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
         scannerRef.current.stop().catch(() => {});
       }
     };
-  }, [isOpen, onScanRoomCode]);
+  }, [isOpen, onClose, onScanRoomCode]);
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="w-full max-w-sm rounded-2xl bg-[#0d1323] border border-slate-700 p-5 space-y-4 shadow-2xl">
+      <div className="w-full max-w-sm rounded-2xl bg-[#14161c] border-2 border-zinc-700/80 p-5 space-y-4 cartoon-card-shadow">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Camera className="w-5 h-5 text-purple-400" />
-            <h3 className="text-base font-semibold text-slate-100">
+            <Camera className="w-5 h-5 text-amber-400" />
+            <h3 className="text-base font-bold text-zinc-100">
               สแกน QR Code เข้าห้อง
             </h3>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
             aria-label="ปิดหน้าต่างสแกน"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="rounded-xl overflow-hidden bg-black border border-slate-800 min-h-[250px] flex items-center justify-center relative">
+        <div className="rounded-xl overflow-hidden bg-black border-2 border-zinc-800 min-h-[250px] flex items-center justify-center relative">
           <div id={containerId} className="w-full" />
           {errorMsg && (
             <div className="p-5 text-center space-y-2">
@@ -225,14 +224,14 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
           )}
         </div>
 
-        <p className="text-xs text-center text-slate-400">
+        <p className="text-xs text-center text-zinc-400">
           ส่องกล้องไปยัง QR Code บนหน้าจอมือถือของผู้สร้างห้อง
         </p>
 
         <button
           type="button"
           onClick={onClose}
-          className="w-full min-h-[48px] rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-medium text-slate-200 transition-colors"
+          className="w-full min-h-[48px] rounded-xl bg-zinc-800 hover:bg-zinc-700 text-sm font-bold text-zinc-200 cartoon-btn-shadow transition-colors"
         >
           ยกเลิกและพิมพ์รหัสด้วยตนเอง
         </button>

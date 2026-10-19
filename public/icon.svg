@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="charcoalBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stopColor="#252930" />
+      <stop offset="100%" stopColor="#101216" />
+    </radialGradient>
+  </defs>
+  <!-- Background Card Tile with Thick Border -->
+  <rect width="512" height="512" rx="110" fill="url(#charcoalBg)" stroke="#3a3f4a" stroke-width="20" />
+  
+  <!-- Warm Golden Cartoon Moon -->
+  <circle cx="256" cy="230" r="160" fill="#f59e0b" stroke="#d97706" stroke-width="12" />
+  <circle cx="210" cy="180" r="28" fill="#fbbf24" opacity="0.6" />
+  <circle cx="310" cy="260" r="20" fill="#fbbf24" opacity="0.6" />
+
+  <!-- Bold Cartoon Howling Werewolf Silhouette with thick lineart -->
+  <path d="M160 420 
+           L190 330 
+           L150 280 
+           L190 250 
+           L175 190 
+           L230 220 
+           L256 185 
+           L282 220 
+           L337 190 
+           L322 250 
+           L362 280 
+           L322 330 
+           L352 420 
+           Z" 
+        fill="#14171c" 
+        stroke="#f3f4f6" 
+        stroke-width="16" 
+        stroke-linejoin="round" />
+  
+  <!-- Glowing Fierce Cartoon Eyes -->
+  <ellipse cx="236" cy="254" rx="8" ry="12" fill="#ef4444" transform="rotate(-15 236 254)" />
+  <ellipse cx="276" cy="254" rx="8" ry="12" fill="#ef4444" transform="rotate(15 276 254)" />
+  <circle cx="236" cy="254" r="3" fill="#ffffff" />
+  <circle cx="276" cy="254" r="3" fill="#ffffff" />
+
+  <!-- Cartoon Claws / Moon Crescent Base Accent -->
+  <path d="M130 435 C200 465, 312 465, 382 435" fill="none" stroke="#f59e0b" stroke-width="14" stroke-linecap="round" />
+</svg>

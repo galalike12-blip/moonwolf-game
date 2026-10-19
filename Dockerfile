@@ -1,4 +1,4 @@
-# Production Dockerfile for Render.com / Cloud Containers
+# Production Dockerfile for Cloud Containers & Render.com
 FROM node:22-slim
 
 WORKDIR /app
@@ -15,10 +15,10 @@ COPY . .
 # Build frontend production bundle
 RUN npm run build
 
-# Render injects $PORT (default 10000), fallback to 3000
+# Default to port 3000 (Render/Cloud Run automatically override $PORT at runtime)
 ENV NODE_ENV=production
-ENV PORT=10000
-EXPOSE 10000
+ENV PORT=3000
+EXPOSE 3000
 
 # Start authoritative Node.js + Express + Socket.io server
 CMD ["npx", "tsx", "server.ts"]
